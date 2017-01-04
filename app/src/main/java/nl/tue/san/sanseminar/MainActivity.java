@@ -95,7 +95,18 @@ public class MainActivity extends AppCompatActivity
         if(contentType == null)
             throw new IllegalArgumentException("ContentType can't be null");
 
-        return HomeFragment.newInstance(contentType.name());
+        switch(contentType){
+
+            case HOME:
+                return HomeFragment.newInstance();
+            case TASK_SET:
+                return TaskSetFragment.newInstance();
+            default:
+                throw new IllegalStateException("Unknown ContentType "+contentType);
+        }
+
+
+
     }
 
 
