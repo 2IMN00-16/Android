@@ -1,7 +1,6 @@
 package nl.tue.san.sanseminar;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
 import android.view.View;
 
 /**
@@ -109,9 +108,14 @@ public interface Navigatable {
 
 
 
-            public Properties build(Fragment fragment){
-
-                return new Properties(this.fabIconResource, this.fabClickListener, this.title);
+            /**
+             * Create a non-mutable Properties object using the properties set on this builder.
+             * The builder does not become invalid after calling this method, and as such it is
+             * possible to use it to create multiple Properties objects.
+             * @return The created properties.
+             */
+            public Properties build(){
+                return new Properties(this.fabIconResource, this.fabClickListener, this.title, this.menuResource);
             }
 
         }

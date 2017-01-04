@@ -39,6 +39,6 @@ public class HomeFragment extends Fragment implements Navigatable {
 
     private final Navigatable.Properties properties = new Navigatable.Properties.Builder()
                                                                 .useTitle(R.string.nav_title_home)
-                                                                .build(this);
+                                                                .build();
 
 }

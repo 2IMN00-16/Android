@@ -41,5 +41,5 @@ public class VisualizationFragment extends Fragment implements Navigatable {
 
     private final Properties properties = new Properties.Builder()
                                                                 .useTitle(R.string.nav_title_visualization)
-                                                                .build(this);
+                                                                .build();
 }

@@ -41,5 +41,5 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
     private final Properties properties = new Properties.Builder()
                                                                 .useTitle(R.string.nav_title_task_set)
-                                                                .build(this);
+                                                                .build();
 }
