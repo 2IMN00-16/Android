@@ -19,6 +19,13 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private NavigationView navigationView;
+
+    /**
+     * The current display state, indicating the current content type, the current fragment and the
+     * properties with which that fragment was inserted.
+     */
+    private DisplayState displayState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,12 +118,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
-    /**
-     * Indicates the ContentType that is currently being displayed
-     */
-    private ContentType currentContentType;
-
     private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.HOME;
     /**
      * Updates the current content type that is being displayed. If the given content type differs
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity
             throw new IllegalArgumentException("Given ContentType can't be null");
 
         // Check whether we're changing
-        if (this.currentContentType == contentType)
+        if (this.displayState != null && this.displayState.contentType == contentType)
             return;
 
         // update the fragment
@@ -167,8 +168,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Update the current content type, and reflect this in the navigation drawer.
-        this.currentContentType = contentType;
-        this.navigationView.setCheckedItem(this.currentContentType.navigationResource);
+        this.displayState = new DisplayState(contentType, fragment, properties);
+        this.navigationView.setCheckedItem(contentType.navigationResource);
 
     }
 
@@ -217,6 +218,22 @@ public class MainActivity extends AppCompatActivity
 
         ContentType(int navigationResource) {
             this.navigationResource = navigationResource;
+        }
+    }
+
+    /**
+     * Class to represent the current display state of this activity.
+     */
+    private final class DisplayState {
+        private final ContentType contentType;
+        private final Fragment fragment;
+        private final Navigatable.Properties properties;
+
+
+        private DisplayState(ContentType contentType, Fragment fragment, Navigatable.Properties properties) {
+            this.contentType = contentType;
+            this.fragment = fragment;
+            this.properties = properties;
         }
     }
 
