@@ -101,6 +101,8 @@ public class MainActivity extends AppCompatActivity
                 return HomeFragment.newInstance();
             case TASK_SET:
                 return TaskSetFragment.newInstance();
+            case VISUALIZATION:
+                return VisualizationFragment.newInstance();
             default:
                 throw new IllegalStateException("Unknown ContentType "+contentType);
         }
