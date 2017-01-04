@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">SAN Seminar</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="nav_title_home">Home</string>
+    <string name="nav_group_title_settings">Settings</string>
+    <string name="nav_title_task_set">Task set</string>
+    <string name="nav_title_visualization">Visualization</string>
+</resources>
