@@ -23,6 +23,8 @@ public interface Navigatable {
         private final int fabIconResource;
         private final View.OnClickListener fabClickListener;
         private final Object title;
+        private final int menuResource;
+
 
         private static final int NONE = -1;
 
@@ -44,10 +46,11 @@ public interface Navigatable {
 
 
 
-        private Properties(int fabIconResource, View.OnClickListener fabClickListener, Object title) {
+        private Properties(int fabIconResource, View.OnClickListener fabClickListener, Object title, int menuResource) {
             this.fabIconResource = fabIconResource;
             this.fabClickListener = fabClickListener;
             this.title = title;
+            this.menuResource = menuResource;
         }
 
         public String getTitle(Context context) {
@@ -57,13 +60,22 @@ public interface Navigatable {
                 return context.getString((int)title);
         }
 
+        public int getMenuResource() {
+            return menuResource;
+        }
+
+        public boolean usesMenu() {
+            return this.menuResource != NONE;
+        }
+
 
         public static class Builder{
-
+            private int menuResource = Properties.NONE;
             private int fabIconResource = Properties.NONE;
             private View.OnClickListener fabClickListener = null;
 
             private Object title = null;
+
 
 
             /**
@@ -106,6 +118,15 @@ public interface Navigatable {
                 return this;
             }
 
+            /**
+             * Use the given resource as an options menu within the action bar.
+             * @param menuResource The resource to inflate as an options menu.
+             * @return This builder for chaining.
+             */
+            public Builder useMenu(int menuResource){
+                this.menuResource = menuResource;
+                return this;
+            }
 
 
             /**

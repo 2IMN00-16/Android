@@ -58,9 +58,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+
+        if(this.displayState != null && this.displayState.properties.usesMenu()){
+            getMenuInflater().inflate(this.displayState.properties.getMenuResource(), menu);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -155,6 +159,9 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setTitle(properties.getTitle(this));
             else
                 actionBar.setTitle("SAN Seminar");
+
+            // Indicate that the options menu should be recreated.
+            this.invalidateOptionsMenu();
         }
 
         // Show and handle the Floating Action Button, if applicable
