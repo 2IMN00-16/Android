@@ -30,7 +30,7 @@ public class Task {
      * @param priority The priority given to jobs of this task.
      * @param threshold The preemption threshold for this job.
      */
-    private Task(String name, int color, int offset, int period, int deadline, int computation, int priority, int threshold) {
+    public Task(String name, int color, int offset, int period, int deadline, int computation, int priority, int threshold) {
         this.setName(name);
         this.setColor(color);
         this.setOffset(offset);
