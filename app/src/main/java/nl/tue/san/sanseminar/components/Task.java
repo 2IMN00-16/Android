@@ -17,7 +17,7 @@ public class Task {
     private int threshold;
     private int color;
 
-    private String name;
+    private final String name;
 
 
     /**
@@ -31,7 +31,7 @@ public class Task {
      * @param threshold The preemption threshold for this job.
      */
     public Task(String name, int color, int offset, int period, int deadline, int computation, int priority, int threshold) {
-        this.setName(name);
+        this.name = name;
         this.setColor(color);
         this.setOffset(offset);
         this.setPeriod(period);
@@ -278,12 +278,6 @@ public class Task {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        if(name == null)
-            throw new IllegalArgumentException("Name can't be null");
-        this.name = name;
     }
 
     @Override
