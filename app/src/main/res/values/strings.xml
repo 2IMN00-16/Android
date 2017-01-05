@@ -9,4 +9,7 @@
     <string name="nav_group_title_settings">Settings</string>
     <string name="nav_title_task_set">Task set</string>
     <string name="nav_title_visualization">Visualization</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
