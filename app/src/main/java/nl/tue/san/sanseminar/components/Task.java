@@ -1,5 +1,7 @@
 package nl.tue.san.sanseminar.components;
 
+import android.graphics.Color;
+
 /**
  * Created by Maurice on 5-1-2017.
  */
@@ -145,12 +147,48 @@ public class Task {
         this.threshold = threshold;
     }
 
+    /**
+     * Get the integer representation of the color that is currently set. The color is a 4 byte
+     * representation following the ARGB specification. The alpha component of the color is always
+     * equal to 255. Thus the following holds at all times: {@code color & 0xFF000000 == 0xFF000000}.
+     * @return The integer representation of the color that is currently set.
+     */
     public int getColor() {
         return color;
     }
 
+    /**
+     * Get a hexadecimal representation of the color. The representation always contains 6
+     * uppercase characters following the pattern RRGGBB.
+     * @return A hexadecimal representation of the color that is currently set.
+     */
+    public String getHexColor(){
+        String hex = Integer.toHexString(this.color);
+        if(hex.length() != 8)
+            throw new IllegalStateException("Expected the 4 byte color to be converted to an 8 character string.");
+        return hex.substring(2);
+    }
+
+    /**
+     * Set the color with which this task is represented. The alpha channel of the given color is
+     * ignored and is instead always set to 255.
+     * @param color The 4 byte ARGB representation of the color.
+     */
     public void setColor(int color) {
-        this.color = color;
+        this.color =  0xFF000000 + (0x00FFFFFF & color);
+    }
+
+    /**
+     * Set the color based on RGB values. The underlying code is
+     * {@code android.graphics.Color#rgb(int, int, int)}. Restrictions that apply to that method
+     * also apply here.
+     * @see android.graphics.Color#rgb(int, int, int)
+     * @param red The red component of the color
+     * @param green The green component of the color
+     * @param blue The blue component of the color
+     */
+    public void setColor(int red, int green, int blue){
+        this.color = Color.rgb(red,green,blue);
     }
 
     public String getName() {
