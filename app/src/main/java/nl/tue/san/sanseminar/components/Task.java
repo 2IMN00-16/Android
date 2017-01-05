@@ -97,13 +97,35 @@ public class Task {
      * In case the threshold is given this value, the minimal interrupt priority is equal to
      * {@code (this.priority + 1)}.
      */
-    private static final int NO_PREEMPTION_THRESHOLD = -1;
+    public static final int NO_PREEMPTION_THRESHOLD = -1;
+
+    /**
+     * Indicates whether a Preemption threshold has been specified for this task.
+     * @return Whether a preemption threshold has been specified for this task.
+     */
+    public boolean hasPreemptionThreshold(){
+        return this.threshold >= 0;
+    }
+
+    /**
+     * Get the minimal priority a task must have (inclusive) to be able to interrupt the execution of this task.
+     * @return The minimal priority a task must have (inclusive) to be able to interrupt this task.
+     */
+    public int getMinimalPreemptionPriority(){
+        return hasPreemptionThreshold() ? threshold : (priority + 1);
+    }
 
     public int getOffset() {
         return offset;
     }
 
+    /**
+     * Set the timestamp at which the first job instance of the task starts.
+     * @param offset The timestamp at which the first job instance of the task starts. Must be at least 0.
+     * @throws IllegalArgumentException If the condition on the argument is not met.
+     */
     public void setOffset(int offset) {
+        assertPositive(priority, "Offset");
         this.offset = offset;
     }
 
@@ -111,7 +133,14 @@ public class Task {
         return period;
     }
 
+    /**
+     * Set the amount of time between two subsequent job instances of the task.
+     * @param period The amount of time between two subsequent job instances of the task. Must be
+     *               strictly greater than 0.
+     * @throws IllegalArgumentException If the condition on the argument is not met.
+     */
     public void setPeriod(int period) {
+        assertStrictlyPositive(priority, "Period");
         this.period = period;
     }
 
@@ -119,7 +148,14 @@ public class Task {
         return deadline;
     }
 
+    /**
+     * Set the deadline of a job relative to the starting point of that job.
+     * @param deadline The deadline of a job relative to the starting point of that job. Must be
+     *                 strictly greater than 0.
+     * @throws IllegalArgumentException If the condition on the argument is not met.
+     */
     public void setDeadline(int deadline) {
+        assertStrictlyPositive(priority, "Relative deadline");
         this.deadline = deadline;
     }
 
@@ -127,7 +163,14 @@ public class Task {
         return computation;
     }
 
+    /**
+     * Set the computation time required to fulfil the job.
+     * @param computation The computation time required to fulfil the job. Must be
+     *                 strictly greater than 0.
+     * @throws IllegalArgumentException If the condition on the argument is not met.
+     */
     public void setComputation(int computation) {
+        assertStrictlyPositive(priority, "Computation time");
         this.computation = computation;
     }
 
@@ -135,7 +178,13 @@ public class Task {
         return priority;
     }
 
+    /**
+     * Set the priority given to jobs of this task.
+     * @param priority The priority given to jobs of this task. Must be at least 0.
+     * @throws IllegalArgumentException If the condition on the argument is not met.
+     */
     public void setPriority(int priority) {
+        assertPositive(priority, "Priority");
         this.priority = priority;
     }
 
@@ -143,8 +192,44 @@ public class Task {
         return threshold;
     }
 
+    /**
+     * Set the preemption threshold for this job.
+     * @param threshold The preemption threshold for this job. Must either have a minimal value of
+     *                  0, or it must be equal to one of the following flags:
+     *                  <ul>
+     *                      <li>{@code NO_PREEMPTION_THRESHOLD}</li>
+     *                  </ul>
+     * @throws IllegalArgumentException If the condition on the argument is not met.
+     * @see nl.tue.san.sanseminar.components.Task#NO_PREEMPTION_THRESHOLD
+     */
     public void setThreshold(int threshold) {
+        if(threshold != NO_PREEMPTION_THRESHOLD)
+            assertPositive(threshold, "Preemption threshold");
         this.threshold = threshold;
+    }
+
+    /**
+     * Asserts that the given value is positive. If the value is not positive, an
+     * {@code IllegalArgumentException} is thrown with the given subject. If the value is positive
+     * the method terminates normally.
+     * @param value The value to assert to be positive, meaning at least 0.
+     * @param subject The subject to include in the Exception if the value is negative.
+     */
+    private void assertPositive(int value, String subject) throws IllegalArgumentException{
+        if(value < 0)
+            throw new IllegalArgumentException(subject+" must be at least 0.");
+    }
+
+    /**
+     * Asserts that the given value is strictly larger than 0. If this does not hold, an
+     * {@code IllegalArgumentException} is thrown with the given subject. If the value is positive
+     * the method terminates normally.
+     * @param value The value to assert to be larger than 0.
+     * @param subject The subject to include in the Exception if the value is negative.
+     */
+    private void assertStrictlyPositive(int value, String subject) throws IllegalArgumentException{
+        if(value <= 0)
+            throw new IllegalArgumentException(subject+" must be strictly greater than 0.");
     }
 
     /**
@@ -196,6 +281,8 @@ public class Task {
     }
 
     public void setName(String name) {
+        if(name == null)
+            throw new IllegalArgumentException("Name can't be null");
         this.name = name;
     }
 }
