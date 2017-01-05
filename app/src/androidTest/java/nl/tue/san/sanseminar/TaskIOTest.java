@@ -21,7 +21,7 @@ public class TaskIOTest {
 
     private final Task t1 = Task.createImmediateTask("T1", 0xFFFF0000,10,5,2,5,5);
     private final Task t2 = Task.createImmediateTaskWithoutThreshold("T2", 0xFFFF00FF,10,5,2,5);
-    private final Task t3 = Task.createTaskWthoutThreshold("T3", 0xFFFFFF00,10,5,2,5,5);
+    private final Task t3 = Task.createTaskWithoutThreshold("T3", 0xFFFFFF00,10,5,2,5,5);
     private final Task t4 = new Task("T4", 0xFFFFFFFF,5,10,5,2,5,2);
 
 

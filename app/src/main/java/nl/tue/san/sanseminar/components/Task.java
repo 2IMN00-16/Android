@@ -88,7 +88,7 @@ public class Task {
      * @return The created task
      */
     // "static" constructor
-    public static Task createTaskWthoutThreshold(String name, int color, int period, int deadline, int computation, int priority, int offset){
+    public static Task createTaskWithoutThreshold(String name, int color, int period, int deadline, int computation, int priority, int offset){
         return new Task(name, color, offset, period, deadline, computation, priority, NO_PREEMPTION_THRESHOLD);
     }
 
