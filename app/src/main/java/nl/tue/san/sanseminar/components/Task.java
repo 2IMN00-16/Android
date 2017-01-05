@@ -125,7 +125,7 @@ public class Task {
      * @throws IllegalArgumentException If the condition on the argument is not met.
      */
     public void setOffset(int offset) {
-        assertPositive(priority, "Offset");
+        assertPositive(offset, "Offset");
         this.offset = offset;
     }
 
@@ -140,7 +140,7 @@ public class Task {
      * @throws IllegalArgumentException If the condition on the argument is not met.
      */
     public void setPeriod(int period) {
-        assertStrictlyPositive(priority, "Period");
+        assertStrictlyPositive(period, "Period");
         this.period = period;
     }
 
@@ -155,7 +155,7 @@ public class Task {
      * @throws IllegalArgumentException If the condition on the argument is not met.
      */
     public void setDeadline(int deadline) {
-        assertStrictlyPositive(priority, "Relative deadline");
+        assertStrictlyPositive(deadline, "Relative deadline");
         this.deadline = deadline;
     }
 
@@ -170,7 +170,7 @@ public class Task {
      * @throws IllegalArgumentException If the condition on the argument is not met.
      */
     public void setComputation(int computation) {
-        assertStrictlyPositive(priority, "Computation time");
+        assertStrictlyPositive(computation, "Computation time");
         this.computation = computation;
     }
 
