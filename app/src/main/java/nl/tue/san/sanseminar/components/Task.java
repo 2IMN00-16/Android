@@ -285,4 +285,35 @@ public class Task {
             throw new IllegalArgumentException("Name can't be null");
         this.name = name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Task task = (Task) o;
+
+        if (offset != task.offset) return false;
+        if (period != task.period) return false;
+        if (deadline != task.deadline) return false;
+        if (computation != task.computation) return false;
+        if (priority != task.priority) return false;
+        if (threshold != task.threshold) return false;
+        if (color != task.color) return false;
+        return name.equals(task.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = offset;
+        result = 31 * result + period;
+        result = 31 * result + deadline;
+        result = 31 * result + computation;
+        result = 31 * result + priority;
+        result = 31 * result + threshold;
+        result = 31 * result + color;
+        result = 31 * result + name.hashCode();
+        return result;
+    }
 }
