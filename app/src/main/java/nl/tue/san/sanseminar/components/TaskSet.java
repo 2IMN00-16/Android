@@ -87,7 +87,7 @@ public class TaskSet extends ReadWriteSafeObject {
         return this.readOp(new Operation<Task>() {
             @Override
             public Task perform() {
-                return TaskSet.this.get(order.get(index))
+                return TaskSet.this.get(order.get(index));
             }
         });
     }
