@@ -1,5 +1,7 @@
 package nl.tue.san.sanseminar.components;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
@@ -29,7 +31,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
     /**
      * By default there is no instance. On the first call to getInstance the instance will be created.
      */
-    private static TaskSetManager instance = new TaskSetManager();
+    private static TaskSetManager instance;
 
     /**
      * Constant describing the extension of TaskSet files. The extension includes the dot.
@@ -40,11 +42,14 @@ public class TaskSetManager extends ReadWriteSafeObject {
     /**
      * Obtain an instance of the TaskSetManager. On the first call to this method the manager is
      * created. Therefore that first call may take more time than subsequent calls.
+     * @param context The context in which the manager is used. This is required to be able to write
+     *                files to the internal storage. 
      * @return The only instance of the TaskSetManager
      */
-    public static TaskSetManager getInstance() {
+    public static TaskSetManager getInstance(Context context) {
+
         if(instance==null)
-            instance = new TaskSetManager();
+            instance = new TaskSetManager(context);
         return instance;
     }
 
@@ -58,8 +63,12 @@ public class TaskSetManager extends ReadWriteSafeObject {
      */
     private final File root;
 
-    private TaskSetManager(){
-        this.root = new File(".");
+    /**
+     * Create a new TaskSetManager that uses the given File as a directory to store TaskSets in.
+     * @param context The Context in which the Manager operates.
+     */
+    public TaskSetManager(Context context) {
+        this.root = new File(context.getFilesDir(), TASK_SETS_FILENAME);
     }
 
 
