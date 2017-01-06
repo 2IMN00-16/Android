@@ -232,4 +232,25 @@ public class TaskSet extends ReadWriteSafeObject {
         // Then insert it into mapping
         return tasks.put(task.getName(), task);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TaskSet taskSet = (TaskSet) o;
+
+        if (!name.equals(taskSet.name)) return false;
+        if (!order.equals(taskSet.order)) return false;
+        return tasks.equals(taskSet.tasks);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + order.hashCode();
+        result = 31 * result + tasks.hashCode();
+        return result;
+    }
 }
