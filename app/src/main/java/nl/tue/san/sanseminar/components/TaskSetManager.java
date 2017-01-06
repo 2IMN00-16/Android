@@ -1,14 +1,21 @@
 package nl.tue.san.sanseminar.components;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject;
@@ -16,105 +23,87 @@ import nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject;
 /**
  * Created by Maurice on 6-1-2017.
  */
-public final class TaskSetManager extends ReadWriteSafeObject{
 
-    private final static TaskSetManager instance = new TaskSetManager();
+public class TaskSetManager extends ReadWriteSafeObject {
 
-    private static final File root = null;
+    /**
+     * By default there is no instance. On the first call to getInstance the instance will be created.
+     */
+    private static TaskSetManager instance = new TaskSetManager();
 
-    private TaskSetManager() { }
+    /**
+     * Constant describing the extension of TaskSet files. The extension includes the dot.
+     */
+    private static final String TASK_SETS_FILENAME = "root.tasksets";
 
 
     /**
-     * Writes the given TaskSet to a file within the root directory as a JSONObject. It uses the
-     * filename as specified by {@link TaskSetManager#fileNameFor(TaskSet)}.
-     * @param taskSet The TaskSet to write
-     * @return Whether the file was successfully written to.
-     * @throws JSONException If the given TaskSet could not be translated to JSON.
+     * Obtain an instance of the TaskSetManager. On the first call to this method the manager is
+     * created. Therefore that first call may take more time than subsequent calls.
+     * @return The only instance of the TaskSetManager
      */
-    private void writeToFile(final TaskSet taskSet) throws IOException, JSONException {
+    public static TaskSetManager getInstance() {
+        if(instance==null)
+            instance = new TaskSetManager();
+        return instance;
+    }
 
-        if(root == null)
-            throw new IOException("Not allowed to access directory");
+    /**
+     * The location of tasksets within
+     */
+    private final LinkedHashMap<String, TaskSet> taskSets = new LinkedHashMap<>();
 
-        final JSONObject translation = TaskSetIO.toJSON(taskSet);
+    /**
+     * The directory in which we can save all TaskSets.
+     */
+    private final File root;
 
-        // Ensure that we have the write lock to write to the directory.
-        IOException exception = this.writeOp(new Operation<IOException>() {
+    private TaskSetManager(){
+        this.root = new File(".");
+    }
+
+
+    /**
+     * Get the TaskSet with the given name.
+     * @param name The name of the TaskSet.
+     * @return The TaskSet with the given name, or null if there is no such TaskSet.
+     */
+    public TaskSet get(final String name){
+        return this.readOp(new Operation<TaskSet>() {
             @Override
-            public IOException perform() {
-                try {
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(root,fileNameFor(taskSet)))));
-                    writer.write(translation.toString());
-                    writer.close();
-                    return null;
-                } catch (IOException e) {
-                    return e;
-                }
+            public TaskSet perform() {
+                return taskSets.get(name);
             }
         });
-
-        // Throw the returned IOException
-        if(exception != null)
-            throw exception;
     }
 
     /**
-     * Get the name of the file that should be used to store a TaskSet that has the given name.
-     * The name of the file is the name of the TaskSet followed by the extension "taskset".
-     * A shorthand method exists to get the file name for a given TaskSet as
-     * {@link #fileNameFor(TaskSet)}.
-     * @param taskSetName The name of the TaskSet to store.
-     * @return The filename that should be used to store a TaskSet.
-     * @see #fileNameFor(TaskSet)
+     * Get the TaskSet located at index 0. The given index is expected to lie within the range [0,size).
+     * @param index The index of the TaskSet to obtain
+     * @return The TaskSet that was located at the given index.
+     * @throws IndexOutOfBoundsException If the given index is out of bounds.
      */
-    private static String fileNameFor(String taskSetName){
-        return taskSetName+".taskset";
+    public TaskSet get(final int index){
+
+        return this.readOp(new Operation<TaskSet>() {
+            @Override
+            public TaskSet perform() {
+                return new ArrayList<>(taskSets.values()).get(index);
+            }
+        });
     }
 
     /**
-     * Get the name of the file that should be used to store the given TaskSet. This equals calling
-     * {@link #fileNameFor(String)} with as argument {@code taskSet.getName()}.
-     * @param taskSet The TaskSet to store.
-     * @return The filename that should be used to store a TaskSet.
-     * @see TaskSetManager#fileNameFor(String)
+     * Get the number of TaskSets managed by this TaskSetManager.
+     * @return The number of TaskSets managed by this TaskSetManager. The returned value is never negative.
      */
-    private static String fileNameFor(TaskSet taskSet){
-        return fileNameFor(taskSet.getName());
-    }
-
-    /**
-     * Save the given TaskSet. This writes the TaskSet to a file. Any existing TaskSet with the same
-     * name will be overwritten.
-     * @param taskSet The TaskSet to save.
-     */
-    public static boolean save(TaskSet taskSet){
-
-        try {
-            instance.writeToFile(taskSet);
-            return true;
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Load the TaskSet with the given name.
-     * @param name The name of the TaskSet to load.
-     * @return The loaded TaskSet, or null if the TaskSet didn't exist.
-     */
-    public static TaskSet load(String name){
-        return null;
-    }
-
-    /**
-     * Load all TaskSets.
-     * @return A Set containing all TaskSets that are available. Modifications on this set are not
-     * reflected in the storage. The returned Set may contain 0 elements but is never {@code null}.
-     */
-    public static Set<TaskSet> loadAll(){
-        return new HashSet<>();
+    public int size(){
+        return this.readOp(new Operation<Integer>() {
+            @Override
+            public Integer perform() {
+                return taskSets.size();
+            }
+        });
     }
 
     /**
@@ -122,8 +111,154 @@ public final class TaskSetManager extends ReadWriteSafeObject{
      * @return A set containing the names of all available TaskSets. The returned Set may contain 0
      * elements but is never {@code null}.
      */
-    public static Set<String> stored() {
-        return new HashSet<>();
+    public Set<String> stored() {
+        return this.readOp(new Operation<Set<String>>() {
+            @Override
+            public Set<String> perform() {
+                return new HashSet<>(taskSets.keySet());
+            }
+        });
+
     }
 
+
+    /**
+     * Asserts that access has been given to the required directory. If access was not given, an
+     * {@link IllegalStateException} is thrown. If the assertion is met, the method terminates
+     * normally.
+     */
+    private void assertAccess(){
+        if(root == null)
+            throw new IllegalStateException("Not allowed to access directory");
+    }
+
+    /**
+     * Register the given TaskSet under this manager.
+     * @param taskSet
+     */
+    public void register(final TaskSet taskSet){
+        this.writeOp(new Operation<TaskSet>() {
+            @Override
+            public TaskSet perform() {
+                return taskSets.put(taskSet.getName(),taskSet);
+            }
+        });
+    }
+
+    /**
+     * Discard the given TaskSet.
+     * @param taskSet
+     * @return
+     */
+    public boolean remove(final TaskSet taskSet){
+        return this.writeOp(new Operation<Boolean>() {
+            @Override
+            public Boolean perform() {
+                if(taskSets.containsKey(taskSet.getName()) && taskSets.get(taskSet.getName()).equals(taskSet)) {
+                    taskSets.remove(taskSet.getName());
+                    return true;
+                }
+                else
+                    return false;
+            }
+        });
+    }
+
+    /**
+     * Remove all TaskSets.
+     */
+    public void removeAll(){
+        this.writeOp(new Operation<Void>() {
+            @Override
+            public Void perform() {
+                taskSets.clear();
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Perform a reload of all TaskSets.
+     */
+    public void reload() throws Exception{
+        assertAccess();
+
+        // Here we read from a file, but we update this object. Therefore we use writeOp and not
+        // readOp.
+        Exception exception = writeOp(new Operation<Exception>() {
+                   @Override
+                   public Exception perform() {
+                       try {
+                           unsafeReload();
+                           return null;
+                       } catch (JSONException | IOException e) {
+                           return e;
+                       }
+                   }
+               });
+
+        if(exception != null)
+            throw exception;
+
+    }
+
+    /**
+     * Performs a reload without synchronization.
+     * @throws JSONException
+     * @throws IOException
+     */
+    private void unsafeReload() throws JSONException, IOException {
+
+        // Convert the root file into a JSONArray
+        StringBuilder builder = new StringBuilder();
+        try (Reader reader = new InputStreamReader(new FileInputStream(this.root))) {
+            while (reader.ready())
+                builder.append(reader.read());
+        }
+        JSONArray array = new JSONArray(new JSONTokener(builder.toString()));
+
+        // Then convert each entry in the JSONArray to a TaskSet.
+        for(int i = 0; i < array.length(); ++i )
+            this.register(TaskSetIO.fromJSON(array.getJSONObject(i)));
+    }
+
+    /**
+     * Writes all TaskSets as a JSONArray to the root file. This does not provide any
+     * synchronization. When calling, this should use external synchronization allowing it to read.
+     * This method does not change any properties on the TaskSetManager.
+     */
+    private void unsafeWrite() throws JSONException, IOException {
+        JSONArray array = new JSONArray();
+        for(TaskSet taskSet : taskSets.values())
+            array.put(TaskSetIO.toJSON(taskSet));
+
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.root)))) {
+            writer.write(array.toString());
+        }
+
+    }
+
+    /**
+     * Write all TaskSets. This provides synchronization.
+     */
+    public void write() throws Exception{
+        assertAccess();
+
+        // To perform a write, we don't update this object. Instead we only read the properties of
+        // this object. Therefore we use a readOp and not a writeOp.
+        Exception exception = this.readOp(new Operation<Exception>() {
+            @Override
+            public Exception perform() {
+                try {
+                    unsafeWrite();
+                    return null;
+                } catch (JSONException | IOException e) {
+                    return e;
+                }
+            }
+        });
+
+        if(exception != null)
+            throw exception;
+    }
 }
