@@ -1,6 +1,7 @@
 package nl.tue.san.sanseminar.components;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,16 +25,48 @@ public class TaskSet extends ReadWriteSafeObject {
     private final ArrayList<String> order;
     private final HashMap<String, Task> tasks;
 
-
-
-    public TaskSet(String name, HashMap<String, Task> tasks, ArrayList<String> order) {
-        this.name = name;
-        this.tasks = tasks;
-        this.order = order;
+    /**
+     * Creates a new TaskSet with the given name, containing the given tasks. The tasks are inserted in the order that they are given in.
+     * @param name
+     * @param tasks
+     */
+    public TaskSet(String name, Task...tasks) {
+        this(name, Arrays.asList(tasks));
     }
 
+    /**
+     * Creates a new TaskSet with the given name, containing the given tasks. The tasks are inserted in the order that they are given in.
+     * @param name
+     * @param tasks
+     */
+    public TaskSet(String name, List<Task> tasks) {
+        this(name, tasks.size());
+
+        // Now write all tasks. It is safe to call insert directly as there can be only one call
+        // occurring on this object right now, and that is the call to this constructor.
+        for(Task task : tasks)
+            this.unsafeInsert(task);
+    }
+
+    /**
+     * Creates a new TaskSet that has the given name. It contains no tasks, but expects to contain
+     * the given number of tasks. A correct size estimation allows for a more efficient storage
+     * usage.
+     * @param name The name of the TaskSet.
+     * @param size The expected number of tasks in this taskset.
+     */
     public TaskSet(String name, int size){
-        this(name, new HashMap<String, Task>(), new ArrayList<String>(size));
+        this.name = name;
+        this.tasks = new HashMap<>();
+        this.order = new ArrayList<>(size);
+    }
+
+    /**
+     * Creates a new TaskSet that contains no tasks, and has the given name.
+     * @param name The name of the TaskSet.
+     */
+    public TaskSet(String name){
+        this(name, 10);
     }
 
 
@@ -174,17 +207,29 @@ public class TaskSet extends ReadWriteSafeObject {
      *          is returned.
      */
     public Task put(final Task task){
-
         return this.writeOp(new Operation<Task>() {
             @Override
             public Task perform() {
-                // Ensure that the taskname only occurs at the end of the order
-                order.remove(task.getName());
-                order.add(task.getName());
-
-                // Then insert it into mapping
-                return tasks.put(task.getName(), task);
+                return TaskSet.this.unsafeInsert(task);
             }
         });
+    }
+
+
+    /**
+     * Insert the given task into the TaskSet. This method performs no synchronization. Therefore it
+     * should <strong>not</strong> be publicly available. Furthermore, it should not be called
+     * without external synchronization.
+     * @param task The task to insert
+     * @return The Task that was evicted by adding the given task. If no task is evicted then null
+     *          is returned.
+     */
+    private Task unsafeInsert(Task task){
+        // Ensure that the taskname only occurs at the end of the order
+        order.remove(task.getName());
+        order.add(task.getName());
+
+        // Then insert it into mapping
+        return tasks.put(task.getName(), task);
     }
 }
