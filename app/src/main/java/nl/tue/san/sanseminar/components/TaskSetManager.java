@@ -1,6 +1,7 @@
 package nl.tue.san.sanseminar.components;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,10 +68,16 @@ public class TaskSetManager extends ReadWriteSafeObject {
      * Create a new TaskSetManager that uses the given File as a directory to store TaskSets in.
      * @param context The Context in which the Manager operates.
      */
-    public TaskSetManager(Context context) {
+    private TaskSetManager(Context context) {
         this.root = new File(context.getFilesDir(), TASK_SETS_FILENAME);
+        try {
+            this.reload();
+        } catch (Exception e) {
+            Log.d("TaskSetManager","Couldn't load tasksets from file "+this.root.getAbsolutePath()+
+                    " due to "+e.getClass().getSimpleName()+":  "+e.getMessage()+"." +
+                    " Call reload on TaskSetManager to get full exception.");
+        }
     }
-
 
     /**
      * Get the TaskSet with the given name.
