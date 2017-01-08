@@ -222,7 +222,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
         StringBuilder builder = new StringBuilder();
         try (Reader reader = new InputStreamReader(new FileInputStream(this.root))) {
             while (reader.ready())
-                builder.append(reader.read());
+                builder.append((char)reader.read());
         }
         JSONArray array = new JSONArray(new JSONTokener(builder.toString()));
 
