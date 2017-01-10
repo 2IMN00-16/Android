@@ -29,6 +29,10 @@ import static android.view.View.VISIBLE;
 
 public class TaskActivity extends AppCompatActivity {
 
+    public static final String INTENT_EXTRA_TASKSET = "taskset";
+    public static final String INTENT_EXTRA_TASK = "task";
+
+
     private TaskSetManager manager;
 
     /**
@@ -84,10 +88,10 @@ public class TaskActivity extends AppCompatActivity {
 
 
 
-        this.intendedTaskName = intentExtras.getString("task");
+        this.intendedTaskName = intentExtras.getString(INTENT_EXTRA_TASK);
 
         // Find the task set
-        this.taskSet = getTaskSet(intentExtras.getString("taskset"));
+        this.taskSet = getTaskSet(intentExtras.getString(INTENT_EXTRA_TASKSET));
 
         // Find whether the task already exists
         if(intendedTaskName != null)
