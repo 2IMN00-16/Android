@@ -2,7 +2,6 @@ package nl.tue.san.sanseminar;
 
 import android.database.DataSetObserver;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,14 +14,10 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.Locale;
 
 import nl.tue.san.sanseminar.components.Task;
@@ -60,7 +55,7 @@ public class TaskActivity extends AppCompatActivity {
         UI COMPONENTS - editors
      */
     private CheckBox defineThresholdCheckBox;
-    private ImageView taskColorEditor;
+    private ColorPickerView taskColorEditor;
     private EditText taskPeriodEditor;
     private EditText taskPriorityEditor;
     private EditText taskPriorityThresholdEditor;
@@ -109,7 +104,10 @@ public class TaskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task);
 
         // EditTexts / editors
-        this.taskColorEditor = ((ImageView)this.findViewById(R.id.task_color));
+        this.taskColorEditor = ((ColorPickerView)this.findViewById(R.id.task_color));
+        this.taskColorEditor.provideFragmentManager(this.getFragmentManager());
+        this.taskColorEditor.setColorOptions(getResources().getIntArray(R.array.default_rainbow));
+
         this.taskPriorityEditor = ((EditText)this.findViewById(R.id.task_priority));
         this.taskPeriodEditor = ((EditText)this.findViewById(R.id.task_period));
         this.taskOffsetEditor = ((EditText)this.findViewById(R.id.task_offset));
@@ -166,11 +164,10 @@ public class TaskActivity extends AppCompatActivity {
 
 
             // Update the spinner
-            Log.d("TaskActivity","Index of "+taskSet.getName()+": "+this.manager.indexOf(taskSet));
             this.taskTaskSet.setSelection(this.manager.indexOf(taskSet));
 
             // Show the correct color
-            this.taskColorEditor.getDrawable().mutate().setColorFilter(this.task.getColor(), PorterDuff.Mode.ADD);
+            this.taskColorEditor.setColor(this.task.getColor());
 
             // Show the preemption threshold EditText, and update the checkbox.
             this.defineThresholdCheckBox.setChecked(this.task.hasPreemptionThreshold());
@@ -276,7 +273,7 @@ public class TaskActivity extends AppCompatActivity {
         final int period = getTextAsInteger(taskPeriodEditor);
         final int computation = getTextAsInteger(taskComputationEditor);
         final int deadline = getTextAsInteger(taskDeadlineEditor);
-        final int color = 0;
+        final int color = this.taskColorEditor.getColorInt();
 
         if(task == null){
             // Create a new task. This requires the name as an additional property.

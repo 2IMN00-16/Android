@@ -77,11 +77,10 @@
                     android:layout_height="wrap_content"
                     android:labelFor="@+id/task_color"/>
 
-                <ImageView
+                <nl.tue.san.sanseminar.ColorPickerView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_margin="10dp"
-                    android:src="@drawable/task_color"
                     android:id="@+id/task_color"/>
 
             </LinearLayout>
