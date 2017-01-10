@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import nl.tue.san.sanseminar.components.TaskSetManager;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity
      * properties with which that fragment was inserted.
      */
     private DisplayState displayState;
+
+    private TaskSetManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,8 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        this.manager = TaskSetManager.getInstance(this);
 
         this.navigationView = (NavigationView) findViewById(R.id.nav_view);
         this.navigationView.setNavigationItemSelectedListener(this);
@@ -119,6 +125,12 @@ public class MainActivity extends AppCompatActivity
 
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.setContentType(this.displayState.contentType);
     }
 
     private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.HOME;

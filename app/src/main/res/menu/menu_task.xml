@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/task_action_save"
+        app:showAsAction="ifRoom"
+        android:id="@+id/task_action_save"
+        android:icon="@android:drawable/ic_menu_save" />
+    <item
+        android:title="@string/task_action_revert"
+        app:showAsAction="ifRoom"
+        android:id="@+id/task_action_revert"
+        android:icon="@android:drawable/ic_menu_revert" />
+    <item android:title="Delete"
+        android:id="@+id/task_action_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:showAsAction="ifRoom" />
+</menu>

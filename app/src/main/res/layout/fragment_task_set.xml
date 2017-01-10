@@ -1,13 +1,19 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.view.ViewPager
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="nl.tue.san.sanseminar.TaskSetFragment">
+    android:layout_height="match_parent" tools:context="nl.tue.san.sanseminar.TaskSetFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v4.view.PagerTitleStrip
+        android:id="@+id/pager_title_strip"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Task set fragment" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="#5c6bc0"
+        android:textColor="#fff"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" />
 
-</FrameLayout>
+</android.support.v4.view.ViewPager>
+
