@@ -299,7 +299,7 @@ public class TaskActivity extends AppCompatActivity {
 
     private int getTextAsInteger(EditText editText){
         String text = editText.getText().toString();
-        return text.length() == 0 ? 0 : Integer.parseInt(editText.getText().toString());
+        return text.length() == 0 ? Integer.parseInt(editText.getHint().toString()) : Integer.parseInt(editText.getText().toString());
     }
 
     /**
