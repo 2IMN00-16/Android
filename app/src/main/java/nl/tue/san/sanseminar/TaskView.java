@@ -69,4 +69,7 @@ public class TaskView extends RelativeLayout {
         this.color.mutate().setColorFilter(this.task.getColor(), PorterDuff.Mode.ADD);
     }
 
+    public Task getTask() {
+        return task;
+    }
 }

@@ -1,5 +1,6 @@
 package nl.tue.san.sanseminar;
 
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -104,9 +105,12 @@ public class TaskSetFragment extends Fragment implements Navigatable {
     private class TaskAdapter implements ListAdapter {
 
         private TaskSet taskSet;
+        private TaskViewClickListener taskViewClickListener;
 
         private TaskAdapter(TaskSet taskSet){
+
             this.taskSet = taskSet;
+            this.taskViewClickListener = new TaskViewClickListener(taskSet);
         }
 
         /**
@@ -226,8 +230,10 @@ public class TaskSetFragment extends Fragment implements Navigatable {
         public View getView(int position, View convertView, ViewGroup parent) {
 
             TaskView view = (TaskView) convertView;
-            if(view == null)
+            if(view == null) {
                 view = new TaskView(getContext());
+                view.setOnClickListener(taskViewClickListener);
+            }
 
             view.setTask((Task) this.getItem(position));
 
@@ -277,6 +283,34 @@ public class TaskSetFragment extends Fragment implements Navigatable {
         @Override
         public boolean isEmpty() {
             return getCount() == 0;
+        }
+    }
+
+    private class TaskViewClickListener implements View.OnClickListener{
+
+        private TaskSet taskSet;
+
+        private TaskViewClickListener(TaskSet taskSet) {
+            this.taskSet = taskSet;
+        }
+
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override
+        public void onClick(View v) {
+
+            if(v instanceof TaskView) {
+                TaskView taskView = (TaskView)v;
+
+                Intent intent = new Intent(TaskSetFragment.this.getActivity(), TaskActivity.class);
+                intent.putExtra("task", taskView.getTask().getName());
+                intent.putExtra("taskset", taskSet.getName());
+
+                startActivity(intent);
+            }
         }
     }
 }
