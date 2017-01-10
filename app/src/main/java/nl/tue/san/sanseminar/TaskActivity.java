@@ -265,6 +265,22 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void validateInput() {
+
+        if(this.getTextAsInteger(taskPriorityEditor) <= 0)
+            throw new IllegalTaskStateException("Priority must be greater than 0", this.taskPriorityEditor);
+
+        if(this.getTextAsInteger(taskDeadlineEditor) <= 0)
+            throw new IllegalTaskStateException("Deadline must be greater than 0", this.taskDeadlineEditor);
+
+        if(this.getTextAsInteger(taskPeriodEditor) <= 0)
+            throw new IllegalTaskStateException("Period must be greater than 0", this.taskPeriodEditor);
+
+        if(this.getTextAsInteger(taskComputationEditor) <= 0)
+            throw new IllegalTaskStateException("Computation must be greater than 0", this.taskComputationEditor);
+
+        if(this.task == null && this.taskNameEditor.getText().length() == 0)
+            throw new IllegalTaskStateException("Name must be defined", this.taskNameEditor);
+
         if(this.defineThresholdCheckBox.isChecked() && this.getTextAsInteger(taskPriorityThresholdEditor) <= this.getTextAsInteger(taskPriorityEditor)){
             throw new IllegalTaskStateException("Priority Threshold must be strictly larger than the priority", this.taskPriorityEditor, this.taskPriorityThresholdEditor);
         }
