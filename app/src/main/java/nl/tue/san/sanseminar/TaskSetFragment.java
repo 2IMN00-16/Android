@@ -27,6 +27,7 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
 
     private TaskSetManager taskSetManager = TaskSetManager.getInstance(this.getContext());
+    private ViewPager viewPager;
 
     public TaskSetFragment() {
         // Required empty public constructor
@@ -41,7 +42,7 @@ public class TaskSetFragment extends Fragment implements Navigatable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        ViewPager viewPager = (ViewPager) inflater.inflate(R.layout.fragment_task_set, container, false);
+        this.viewPager = (ViewPager) inflater.inflate(R.layout.fragment_task_set, container, false);
 
         viewPager.setAdapter(new TaskSetAdapter());
 
@@ -58,7 +59,30 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
     private final Properties properties = new Properties.Builder()
                                                                 .useTitle(R.string.nav_title_task_set)
+                                                                .useFabIcon(R.drawable.ic_plus)
+                                                                .useFabHandler(new View.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick(View v) {
+                                                                        createNewTask();
+                                                                    }
+                                                                })
                                                                 .build();
+
+    /**
+     * Creates a new Task in the currently displaying TaskSet.
+     */
+    private void createNewTask() {
+        TaskSet currentlyDisplayed = taskSetManager.get(this.viewPager.getCurrentItem());
+        this.createOrModify(currentlyDisplayed, null);
+    }
+
+
+    private void createOrModify(TaskSet taskSet, String taskName){
+        Intent intent = new Intent(TaskSetFragment.this.getActivity(), TaskActivity.class);
+        intent.putExtra(TaskActivity.INTENT_EXTRA_TASK, taskName);
+        intent.putExtra(TaskActivity.INTENT_EXTRA_TASKSET, taskSet.getName());
+        startActivity(intent);
+    }
 
     /**
      * PagerAdapter that creates a page for each TaskSet.
@@ -301,15 +325,8 @@ public class TaskSetFragment extends Fragment implements Navigatable {
          */
         @Override
         public void onClick(View v) {
-
             if(v instanceof TaskView) {
-                TaskView taskView = (TaskView)v;
-
-                Intent intent = new Intent(TaskSetFragment.this.getActivity(), TaskActivity.class);
-                intent.putExtra("task", taskView.getTask().getName());
-                intent.putExtra("taskset", taskSet.getName());
-
-                startActivity(intent);
+                createOrModify(taskSet, ((TaskView)v).getTask().getName());
             }
         }
     }
