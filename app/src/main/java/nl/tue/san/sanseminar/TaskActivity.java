@@ -280,7 +280,8 @@ public class TaskActivity extends AppCompatActivity {
 
 
     private int getTextAsInteger(EditText editText){
-        return Integer.parseInt(editText.getText().toString());
+        String text = editText.getText().toString();
+        return text.length() == 0 ? 0 : Integer.parseInt(editText.getText().toString());
     }
 
     /**
