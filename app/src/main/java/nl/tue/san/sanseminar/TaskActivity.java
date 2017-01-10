@@ -243,6 +243,9 @@ public class TaskActivity extends AppCompatActivity {
         if(this.defineThresholdCheckBox.isChecked() && this.getTextAsInteger(taskPriorityThresholdEditor) <= this.getTextAsInteger(taskPriorityEditor)){
             throw new IllegalTaskStateException("Priority Threshold must be strictly larger than the priority", this.taskPriorityEditor, this.taskPriorityThresholdEditor);
         }
+        TaskSet selected = ((TaskSet)this.taskTaskSet.getSelectedItem());
+        if(this.taskSet != selected && selected.get(this.taskNameEditor.getText().toString()) != null )
+            throw new IllegalTaskStateException("A Task with the given name already exists in the intended Task Set. ", this.taskTaskSet, this.taskNameEditor);
     }
 
     /**
@@ -274,11 +277,13 @@ public class TaskActivity extends AppCompatActivity {
         final int computation = getTextAsInteger(taskComputationEditor);
         final int deadline = getTextAsInteger(taskDeadlineEditor);
         final int color = this.taskColorEditor.getColorInt();
+        final TaskSet taskSet = (TaskSet) this.taskTaskSet.getSelectedItem();
 
         if(task == null){
             // Create a new task. This requires the name as an additional property.
             final String name = taskNameEditor.getText().toString();
             task = new Task(name, color, offset, period, deadline, computation, priority, priorityThreshold);
+            taskSet.put(task);
             return true;
         }
         else
@@ -291,6 +296,14 @@ public class TaskActivity extends AppCompatActivity {
             this.task.setComputation(computation);
             this.task.setDeadline(deadline);
             this.task.setColor(color);
+
+            // If the owning taskset change, unregister the current taskset, and register the new one
+            if(this.taskSet != taskSet){
+                this.taskSet.remove(task);
+                taskSet.put(task);
+                this.taskSet = taskSet;
+            }
+
             return false;
         }
 
