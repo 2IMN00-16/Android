@@ -490,12 +490,10 @@ public class TaskActivity extends AppCompatActivity {
     private class IllegalTaskStateException extends IllegalStateException{
 
         final View[] invalid;
-        final String message;
-
 
         private IllegalTaskStateException(String message, View ...invalid) {
+            super(message);
             this.invalid = invalid;
-            this.message = message;
         }
     }
 }
