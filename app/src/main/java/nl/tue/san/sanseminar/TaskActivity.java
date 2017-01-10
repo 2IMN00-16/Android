@@ -151,6 +151,8 @@ public class TaskActivity extends AppCompatActivity {
         this.taskNameEditor.setText(this.intendedTaskName);
         this.taskTaskSet.setAdapter(new TaskSetSpinnerAdapter());
 
+        // Update the spinner
+        this.taskTaskSet.setSelection(this.manager.indexOf(taskSet));
 
         /*
          Then do stuff specific to if a task is set.
@@ -165,10 +167,6 @@ public class TaskActivity extends AppCompatActivity {
             setIntegerAsText(this.taskOffsetEditor, this.task.getOffset());
             setIntegerAsText(this.taskComputationEditor, this.task.getComputation());
             setIntegerAsText(this.taskDeadlineEditor, this.task.getDeadline());
-
-
-            // Update the spinner
-            this.taskTaskSet.setSelection(this.manager.indexOf(taskSet));
 
             // Show the correct color
             this.taskColorEditor.setColor(this.task.getColor());
