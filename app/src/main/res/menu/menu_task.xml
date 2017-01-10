@@ -11,4 +11,8 @@
         app:showAsAction="ifRoom"
         android:id="@+id/task_action_revert"
         android:icon="@android:drawable/ic_menu_revert" />
+    <item android:title="Delete"
+        android:id="@+id/task_action_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:showAsAction="ifRoom" />
 </menu>

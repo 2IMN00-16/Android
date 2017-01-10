@@ -212,6 +212,9 @@ public class TaskActivity extends AppCompatActivity {
             case R.id.task_action_revert:
                 revert();
                 return true;
+            case R.id.task_action_delete:
+                tryDelete();
+                return true;
             default: return super.onOptionsItemSelected(item);
         }
     }
@@ -224,6 +227,26 @@ public class TaskActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void tryDelete(){
+        try {
+            this.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * If a Task is being modified the modified task will be removed from its TaskSet. This change is then committed to the manager, after which the activity is terminated.
+     * If we're currently in the process of creating a new task, the progress is discarded.
+     * @throws Exception
+     */
+    private void delete() throws Exception {
+        if(this.task != null)
+            this.taskSet.remove(task);
+        this.manager.write();
+        this.finish();
     }
 
     /**
