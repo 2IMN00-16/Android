@@ -19,6 +19,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Set;
 
 import nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject;
@@ -276,5 +277,14 @@ public class TaskSetManager extends ReadWriteSafeObject {
 
         if(exception != null)
             throw exception;
+    }
+
+    /**
+     * Indicates the position at which the given taskset is stored.
+     * @param taskSet
+     * @return
+     */
+    public int indexOf(TaskSet taskSet){
+        return new LinkedList<>(this.taskSets.values()).indexOf(taskSet);
     }
 }
