@@ -66,7 +66,7 @@ public class TaskView extends RelativeLayout {
     private void syncView(){
         this.name.setText(this.task.getName());
         this.priority.setText(String.format(Locale.getDefault(), "%d", this.task.getPriority()));
-        this.color.mutate().setColorFilter(this.task.getColor(), PorterDuff.Mode.MULTIPLY);
+        this.color.mutate().setColorFilter(this.task.getColor(), PorterDuff.Mode.ADD);
     }
 
 }
