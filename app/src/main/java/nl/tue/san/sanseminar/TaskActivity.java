@@ -3,8 +3,8 @@ package nl.tue.san.sanseminar;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -228,6 +228,7 @@ public class TaskActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             e.printStackTrace();
+            new AlertDialog.Builder(this).setTitle("Can't save").setMessage(e.getMessage()).create().show();
         }
     }
 
@@ -236,6 +237,7 @@ public class TaskActivity extends AppCompatActivity {
             this.delete();
         } catch (Exception e) {
             e.printStackTrace();
+            new AlertDialog.Builder(this).setTitle("Can't delete").setMessage(e.getMessage()).create().show();
         }
     }
 
