@@ -41,7 +41,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
-                        android:text="Name"
+                        android:hint="Name"
                         android:ems="10"
                         android:id="@+id/task_name" />
 
@@ -117,6 +117,7 @@
                         android:inputType="number"
                         android:ems="10"
                         android:id="@+id/task_priority"
+                        android:hint="0"
                         />
 
                 </LinearLayout>
@@ -124,7 +125,8 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/task_priority_threshold_container">
+                    android:id="@+id/task_priority_threshold_container"
+                    android:visibility="gone">
                     <TextView
                         android:text="Priority Threshold"
                         android:layout_width="match_parent"
@@ -135,7 +137,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text=""
+                        android:hint="0"
                         android:ems="10"
                         android:id="@+id/task_priority_threshold" />
 
@@ -177,6 +179,7 @@
                     android:inputType="number"
                     android:ems="10"
                     android:id="@+id/task_computation"
+                    android:hint="1"
                     />
 
             </LinearLayout>
@@ -198,6 +201,7 @@
                     android:inputType="number"
                     android:ems="10"
                     android:id="@+id/task_deadline"
+                    android:hint="1"
                     />
 
             </LinearLayout>
@@ -226,6 +230,7 @@
                     android:inputType="number"
                     android:ems="10"
                     android:id="@+id/task_period"
+                    android:hint="1"
                     />
 
             </LinearLayout>
@@ -247,6 +252,7 @@
                     android:inputType="number"
                     android:ems="10"
                     android:id="@+id/task_offset"
+                    android:hint="0"
                     />
 
             </LinearLayout>
