@@ -129,7 +129,7 @@ public class TaskActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     taskPriorityThresholdContainer.setVisibility(isChecked ? VISIBLE : GONE);
                 if(getTextAsInteger(taskPriorityThresholdEditor) < 0)
-                    setIntegerAsText(taskPriorityThresholdEditor, Math.max(getTextAsInteger(taskPriorityEditor) - 1, 0));
+                    setIntegerAsText(taskPriorityThresholdEditor, Math.max(getTextAsInteger(taskPriorityEditor) + 1, 0));
             }
         });
     }
@@ -240,8 +240,8 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void validateInput() {
-        if(this.defineThresholdCheckBox.isChecked() && this.getTextAsInteger(taskPriorityThresholdEditor) >= this.getTextAsInteger(taskPriorityEditor)){
-            throw new IllegalTaskStateException("Priority Threshold must be strictly smaller than the priority", this.taskPriorityEditor, this.taskPriorityThresholdEditor);
+        if(this.defineThresholdCheckBox.isChecked() && this.getTextAsInteger(taskPriorityThresholdEditor) <= this.getTextAsInteger(taskPriorityEditor)){
+            throw new IllegalTaskStateException("Priority Threshold must be strictly larger than the priority", this.taskPriorityEditor, this.taskPriorityThresholdEditor);
         }
     }
 
