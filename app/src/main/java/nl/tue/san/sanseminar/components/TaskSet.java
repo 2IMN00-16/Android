@@ -215,6 +215,19 @@ public class TaskSet extends ReadWriteSafeObject {
         });
     }
 
+    /**
+     * Remove the given task.
+     * @param task The task to remove.
+     * @return whether or not the given task was contained.
+     */
+    public boolean remove(final Task task){
+        return this.writeOp(new Operation<Boolean>() {
+            @Override
+            public Boolean perform() {
+                return TaskSet.this.unsafeRemove(task) != null;
+            }
+        });
+    }
 
     /**
      * Insert the given task into the TaskSet. This method performs no synchronization. Therefore it
@@ -231,6 +244,18 @@ public class TaskSet extends ReadWriteSafeObject {
 
         // Then insert it into mapping
         return tasks.put(task.getName(), task);
+    }
+    /**
+     * Remove the given task from the TaskSet. This method performs no synchronization. Therefore it
+     * should <strong>not</strong> be publicly available. Furthermore, it should not be called
+     * without external synchronization.
+     * @param task The task to remove
+     * @return The Task that was removed. The returned task will always be equal to the given task
+     *          or null if the given task was not contained.
+     */
+    private Task unsafeRemove(Task task){
+        order.remove(task.getName());
+        return tasks.remove(task.getName());
     }
 
     @Override
