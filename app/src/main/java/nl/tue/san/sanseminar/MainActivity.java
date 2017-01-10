@@ -121,6 +121,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.setContentType(this.displayState.contentType);
+    }
+
     private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.HOME;
     /**
      * Updates the current content type that is being displayed. If the given content type differs
