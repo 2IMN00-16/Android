@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar;
+package nl.tue.san.ui;
 
 import android.database.DataSetObserver;
 import android.graphics.Color;
@@ -20,9 +20,10 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import nl.tue.san.sanseminar.components.Task;
-import nl.tue.san.sanseminar.components.TaskSet;
-import nl.tue.san.sanseminar.components.TaskSetManager;
+import nl.tue.san.sanseminar.R;
+import nl.tue.san.tasks.Task;
+import nl.tue.san.tasks.TaskSet;
+import nl.tue.san.tasks.TaskSetManager;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;

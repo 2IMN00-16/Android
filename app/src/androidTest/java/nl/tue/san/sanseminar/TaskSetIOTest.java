@@ -4,9 +4,9 @@ import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import nl.tue.san.sanseminar.components.Task;
-import nl.tue.san.sanseminar.components.TaskSet;
-import nl.tue.san.sanseminar.components.TaskSetIO;
+import nl.tue.san.tasks.Task;
+import nl.tue.san.tasks.TaskSet;
+import nl.tue.san.tasks.TaskSetIO;
 
 /**
  * Created by Maurice on 6-1-2017.

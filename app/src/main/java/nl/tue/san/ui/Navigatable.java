@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar;
+package nl.tue.san.ui;
 
 import android.content.Context;
 import android.view.View;

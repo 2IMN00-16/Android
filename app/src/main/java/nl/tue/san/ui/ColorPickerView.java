@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar;
+package nl.tue.san.ui;
 
 import android.app.FragmentManager;
 import android.content.Context;
@@ -17,6 +17,8 @@ import org.xdty.preference.colorpicker.ColorPickerDialog;
 import org.xdty.preference.colorpicker.ColorPickerSwatch;
 
 import java.util.Arrays;
+
+import nl.tue.san.sanseminar.R;
 
 /**
  * Created by Maurice on 10-1-2017.
