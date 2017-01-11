@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.components;
+package nl.tue.san.sanseminar.components.tasks;
 
 import android.graphics.Color;
 
@@ -200,7 +200,7 @@ public class Task {
      *                      <li>{@code NO_PREEMPTION_THRESHOLD}</li>
      *                  </ul>
      * @throws IllegalArgumentException If the condition on the argument is not met.
-     * @see nl.tue.san.sanseminar.components.Task#NO_PREEMPTION_THRESHOLD
+     * @see Task#NO_PREEMPTION_THRESHOLD
      */
     public void setThreshold(int threshold) {
         if(threshold != NO_PREEMPTION_THRESHOLD)

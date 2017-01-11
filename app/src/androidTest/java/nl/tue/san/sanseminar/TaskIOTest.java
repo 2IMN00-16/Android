@@ -8,8 +8,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import nl.tue.san.sanseminar.components.Task;
-import nl.tue.san.sanseminar.components.TaskIO;
+import nl.tue.san.sanseminar.components.tasks.Task;
+import nl.tue.san.sanseminar.components.tasks.TaskIO;
 
 /**
  * Created by Maurice on 5-1-2017.

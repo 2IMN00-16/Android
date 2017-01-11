@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.components;
+package nl.tue.san.sanseminar.components.tasks;
 
 import android.content.Context;
 import android.util.Log;

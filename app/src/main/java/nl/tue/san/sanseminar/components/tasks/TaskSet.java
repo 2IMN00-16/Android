@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.components;
+package nl.tue.san.sanseminar.components.tasks;
 
 import java.util.ArrayList;
 import java.util.Arrays;

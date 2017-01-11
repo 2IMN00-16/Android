@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import nl.tue.san.sanseminar.components.TaskSetManager;
+import nl.tue.san.sanseminar.components.tasks.TaskSetManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import nl.tue.san.sanseminar.components.Task;
+import nl.tue.san.sanseminar.components.tasks.Task;
 
 /**
  * Created by Maurice on 8-1-2017.

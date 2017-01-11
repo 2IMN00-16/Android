@@ -20,9 +20,9 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import nl.tue.san.sanseminar.components.Task;
-import nl.tue.san.sanseminar.components.TaskSet;
-import nl.tue.san.sanseminar.components.TaskSetManager;
+import nl.tue.san.sanseminar.components.tasks.Task;
+import nl.tue.san.sanseminar.components.tasks.TaskSet;
+import nl.tue.san.sanseminar.components.tasks.TaskSetManager;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;

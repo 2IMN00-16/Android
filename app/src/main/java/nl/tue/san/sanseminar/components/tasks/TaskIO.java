@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.components;
+package nl.tue.san.sanseminar.components.tasks;
 
 import org.json.JSONException;
 import org.json.JSONObject;

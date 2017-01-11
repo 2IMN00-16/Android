@@ -11,11 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import nl.tue.san.sanseminar.components.Task;
-import nl.tue.san.sanseminar.components.TaskSet;
-import nl.tue.san.sanseminar.components.TaskSetManager;
+import nl.tue.san.sanseminar.components.tasks.Task;
+import nl.tue.san.sanseminar.components.tasks.TaskSet;
+import nl.tue.san.sanseminar.components.tasks.TaskSetManager;
 
 
 /**
