@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar;
+package nl.tue.san.ui;
 
 import android.content.Intent;
 import android.database.DataSetObserver;
@@ -12,9 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import nl.tue.san.sanseminar.components.tasks.Task;
-import nl.tue.san.sanseminar.components.tasks.TaskSet;
-import nl.tue.san.sanseminar.components.tasks.TaskSetManager;
+import nl.tue.san.sanseminar.R;
+import nl.tue.san.tasks.Task;
+import nl.tue.san.tasks.TaskSet;
+import nl.tue.san.tasks.TaskSetManager;
 
 
 /**

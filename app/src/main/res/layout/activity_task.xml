@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="nl.tue.san.sanseminar.TaskActivity">
+    tools:context="nl.tue.san.sanseminar.nl.tue.san.ui.TaskActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:labelFor="@+id/task_color"/>
 
-                <nl.tue.san.sanseminar.ColorPickerView
+                <nl.tue.san.ui.ColorPickerView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_margin="10dp"

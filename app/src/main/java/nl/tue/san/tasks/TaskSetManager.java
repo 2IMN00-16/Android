@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.components.tasks;
+package nl.tue.san.tasks;
 
 import android.content.Context;
 import android.util.Log;
@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
-import nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject;
+import nl.tue.san.util.ReadWriteSafeObject;
 
 /**
  * Created by Maurice on 6-1-2017.

@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.components.tasks;
+package nl.tue.san.tasks;
 
 import android.graphics.Color;
 

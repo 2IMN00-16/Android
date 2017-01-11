@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.components.tasks;
+package nl.tue.san.tasks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,15 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject;
+import nl.tue.san.util.ReadWriteSafeObject;
 
 /**
  * Created by Maurice on 5-1-2017.
  *
  * Contains Tasks such that the tasks are obtainable by name and by index. It is thread safe in the
  * sense that no other operations can occur while new elements are being added to the TaskSet. For
- * more information, see {@link nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject}.
- * @see nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject
+ * more information, see {@link nl.tue.san.util.ReadWriteSafeObject}.
+ * @see nl.tue.san.util.ReadWriteSafeObject
  */
 
 public class TaskSet extends ReadWriteSafeObject {

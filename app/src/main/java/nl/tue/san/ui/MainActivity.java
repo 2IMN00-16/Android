@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar;
+package nl.tue.san.ui;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,7 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import nl.tue.san.sanseminar.components.tasks.TaskSetManager;
+import nl.tue.san.sanseminar.R;
+import nl.tue.san.tasks.TaskSetManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

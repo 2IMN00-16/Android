@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar.concurrent;
+package nl.tue.san.util;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Created by Maurice on 5-1-2017.
  *
  * This object uses a single ReadWriteLock to allow read and write operations to occur. To use these
- * locks, call {@link nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject#readOp(Operation)} or
- * {@link nl.tue.san.sanseminar.concurrent.ReadWriteSafeObject#writeOp(Operation)}, providing an
+ * locks, call {@link nl.tue.san.util.ReadWriteSafeObject#readOp(Operation)} or
+ * {@link nl.tue.san.util.ReadWriteSafeObject#writeOp(Operation)}, providing an
  * Operation that should be executed when the lock is obtained. Not that multiple reads may occur
  * simultaneously, but a combination of reads and writes, or multiple writes, may not.
  */

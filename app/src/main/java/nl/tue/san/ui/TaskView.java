@@ -1,4 +1,4 @@
-package nl.tue.san.sanseminar;
+package nl.tue.san.ui;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -13,7 +13,8 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import nl.tue.san.sanseminar.components.tasks.Task;
+import nl.tue.san.sanseminar.R;
+import nl.tue.san.tasks.Task;
 
 /**
  * Created by Maurice on 8-1-2017.
