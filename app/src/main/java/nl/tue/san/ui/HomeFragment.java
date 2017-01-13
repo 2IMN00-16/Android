@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.Spinner;
 
 import nl.tue.san.sanseminar.R;
 
@@ -15,6 +17,10 @@ import nl.tue.san.sanseminar.R;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment implements Navigatable {
+
+
+    private ListView lightsListView;
+    private Spinner scheduler, taskSet;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -28,7 +34,15 @@ public class HomeFragment extends Fragment implements Navigatable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View inflated = inflater.inflate(R.layout.fragment_home, container, false);
+
+        this.lightsListView = (ListView)inflated.findViewById(R.id.lights);
+        this.scheduler = (Spinner)inflated.findViewById(R.id.scheduler_spinner);
+        this.taskSet = (Spinner)inflated.findViewById(R.id.task_set_spinner);
+
+
+
+        return inflated;
     }
 
     /**
