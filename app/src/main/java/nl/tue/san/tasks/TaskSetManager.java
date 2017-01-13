@@ -4,33 +4,26 @@ import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
-import nl.tue.san.net.*;
-import nl.tue.san.util.ReadWriteSafeObject;
+import nl.tue.san.net.Callback;
+import nl.tue.san.net.Server;
+import nl.tue.san.util.Manager;
+import nl.tue.san.util.ReadWriteSafeObject.Operation;
 
 /**
  * Created by Maurice on 6-1-2017.
  */
 
-public class TaskSetManager extends ReadWriteSafeObject {
+public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
 
     /**
      * By default there is no instance. On the first call to getInstance the instance will be created.
@@ -58,29 +51,12 @@ public class TaskSetManager extends ReadWriteSafeObject {
     }
 
     /**
-     * The location of tasksets within
-     */
-    private final LinkedHashMap<String, TaskSet> taskSets = new LinkedHashMap<>();
-
-    /**
-     * The directory in which we can save all TaskSets.
-     */
-    private final File root;
-
-    /**
      * Create a new TaskSetManager that uses the given File as a directory to store TaskSets in.
      *
      * @param context The Context in which the Manager operates.
      */
     private TaskSetManager(Context context) {
-        this.root = new File(context.getFilesDir(), TASK_SETS_FILENAME);
-        try {
-            this.reload();
-        } catch (Exception e) {
-            Log.d("TaskSetManager", "Couldn't load tasksets from file " + this.root.getAbsolutePath() +
-                    " due to " + e.getClass().getSimpleName() + ":  " + e.getMessage() + "." +
-                    " Call reload on TaskSetManager to get full exception.");
-        }
+        super(new File(context.getFilesDir(), TASK_SETS_FILENAME));
     }
 
     /**
@@ -93,7 +69,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
         return this.readOp(new Operation<TaskSet>() {
             @Override
             public TaskSet perform() {
-                return taskSets.get(name);
+                return managed().get(name);
             }
         });
     }
@@ -110,7 +86,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
         return this.readOp(new Operation<TaskSet>() {
             @Override
             public TaskSet perform() {
-                return new ArrayList<>(taskSets.values()).get(index);
+                return new ArrayList<>(managed().values()).get(index);
             }
         });
     }
@@ -124,7 +100,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
         return this.readOp(new Operation<Integer>() {
             @Override
             public Integer perform() {
-                return taskSets.size();
+                return managed().size();
             }
         });
     }
@@ -139,7 +115,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
         return this.readOp(new Operation<Set<String>>() {
             @Override
             public Set<String> perform() {
-                return new HashSet<>(taskSets.keySet());
+                return new HashSet<>(managed().keySet());
             }
         });
 
@@ -147,13 +123,42 @@ public class TaskSetManager extends ReadWriteSafeObject {
 
 
     /**
-     * Asserts that access has been given to the required directory. If access was not given, an
-     * {@link IllegalStateException} is thrown. If the assertion is met, the method terminates
-     * normally.
+     * Convert the managed object to a String. This method and {@link #unmarshall(String)} must be
+     * defined in such a way that {@code unmarshall(marshall(managed)).equals(managed)}. If this
+     * does not hold, the marshalling is useless.
+     *
+     * @param managed The managed object to marshall.
+     * @return A marshalling of the managed object that can be unmarshalled to recreate the managed
+     * object.
+     * @throws Exception If anything went wrong during marshalling.
      */
-    private void assertAccess() {
-        if (root == null)
-            throw new IllegalStateException("Not allowed to access directory");
+    @Override
+    protected String marshall(LinkedHashMap<String, TaskSet> managed) throws Exception {
+        JSONArray array = new JSONArray();
+        for (TaskSet taskSet : managed.values())
+            array.put(TaskSetIO.toJSON(taskSet));
+        return array.toString();
+    }
+
+    /**
+     * Convert a String back to the managed object. This method and {@link #marshall(Object)} must
+     * be defined in such a way that {@code unmarshall(marshall(managed)).equals(managed)}. If this
+     * does not hold, the unmarshalling is useless.
+     *
+     * @param content A String that was the result of calling marshall on the managed object.
+     * @return The object that was described by the given string, which should be managed.
+     * @throws Exception If anything went wrong during unmarshalling.
+     */
+    @Override
+    protected LinkedHashMap<String, TaskSet> unmarshall(String content) throws Exception {
+        LinkedHashMap<String, TaskSet> map = new LinkedHashMap<>();
+        JSONArray array = new JSONArray(new JSONTokener(content));
+        for (int i = 0; i < array.length(); ++i){
+            TaskSet taskSet = TaskSetIO.fromJSON(array.getJSONObject(i));
+            map.put(taskSet.getName(), taskSet);
+        }
+
+        return map;
     }
 
     /**
@@ -165,7 +170,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
         this.writeOp(new Operation<TaskSet>() {
             @Override
             public TaskSet perform() {
-                return taskSets.put(taskSet.getName(), taskSet);
+                return managed().put(taskSet.getName(), taskSet);
             }
         });
     }
@@ -180,8 +185,8 @@ public class TaskSetManager extends ReadWriteSafeObject {
         return this.writeOp(new Operation<Boolean>() {
             @Override
             public Boolean perform() {
-                if (taskSets.containsKey(taskSet.getName()) && taskSets.get(taskSet.getName()).equals(taskSet)) {
-                    taskSets.remove(taskSet.getName());
+                if (managed().containsKey(taskSet.getName()) && managed().get(taskSet.getName()).equals(taskSet)) {
+                    managed().remove(taskSet.getName());
                     return true;
                 } else
                     return false;
@@ -196,33 +201,10 @@ public class TaskSetManager extends ReadWriteSafeObject {
         this.writeOp(new Operation<Void>() {
             @Override
             public Void perform() {
-                taskSets.clear();
+                managed().clear();
                 return null;
             }
         });
-    }
-
-    /**
-     * Perform a reload of all TaskSets.
-     */
-    public void reload() throws Exception {
-        assertAccess();
-
-        Exception exception = writeOp(new Operation<Exception>() {
-            @Override
-            public Exception perform() {
-                try {
-                    unsafeReload();
-                    return null;
-                } catch (JSONException | IOException e) {
-                    return e;
-                }
-            }
-        });
-
-        if (exception != null)
-            this.loadFromServer();
-//            throw exception;
     }
 
     private void loadFromServer() {
@@ -253,73 +235,12 @@ public class TaskSetManager extends ReadWriteSafeObject {
     }
 
     /**
-     * Performs a reload without synchronization.
-     *
-     * @throws JSONException
-     * @throws IOException
-     */
-    private void unsafeReload() throws JSONException, IOException {
-
-        // Convert the root file into a JSONArray
-        StringBuilder builder = new StringBuilder();
-        try (Reader reader = new InputStreamReader(new FileInputStream(this.root))) {
-            while (reader.ready())
-                builder.append((char) reader.read());
-        }
-        JSONArray array = new JSONArray(new JSONTokener(builder.toString()));
-
-        // Then convert each entry in the JSONArray to a TaskSet.
-        for (int i = 0; i < array.length(); ++i)
-            this.register(TaskSetIO.fromJSON(array.getJSONObject(i)));
-    }
-
-    /**
-     * Writes all TaskSets as a JSONArray to the root file. This does not provide any
-     * synchronization. When calling, this should use external synchronization allowing it to read.
-     * This method does not change any properties on the TaskSetManager.
-     */
-    private void unsafeWrite() throws JSONException, IOException {
-        JSONArray array = new JSONArray();
-        for (TaskSet taskSet : taskSets.values())
-            array.put(TaskSetIO.toJSON(taskSet));
-
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.root)))) {
-            writer.write(array.toString());
-        }
-
-    }
-
-    /**
-     * Write all TaskSets. This provides synchronization.
-     */
-    public void write() throws Exception {
-        assertAccess();
-
-        // To perform a write, we don't update this object. Instead we only read the properties of
-        // this object. Therefore we use a readOp and not a writeOp.
-        Exception exception = this.readOp(new Operation<Exception>() {
-            @Override
-            public Exception perform() {
-                try {
-                    unsafeWrite();
-                    return null;
-                } catch (JSONException | IOException e) {
-                    return e;
-                }
-            }
-        });
-
-        if (exception != null)
-            throw exception;
-    }
-
-    /**
      * Indicates the position at which the given taskset is stored.
      *
      * @param taskSet
      * @return
      */
     public int indexOf(TaskSet taskSet) {
-        return new LinkedList<>(this.taskSets.values()).indexOf(taskSet);
+        return new LinkedList<>(this.managed().values()).indexOf(taskSet);
     }
 }
