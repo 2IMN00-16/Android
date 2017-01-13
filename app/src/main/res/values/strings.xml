@@ -14,4 +14,7 @@
     <string name="task_action_save">Save</string>
     <string name="task_action_revert">Revert</string>
     <string name="color_picker_title">Select color</string>
+    <string name="home_select_task_set">Task set</string>
+    <string name="home_select_scheduler">Scheduler</string>
+    <string name="home_select_light_state">Lights</string>
 </resources>
