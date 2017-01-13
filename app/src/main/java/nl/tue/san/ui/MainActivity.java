@@ -118,8 +118,6 @@ public class MainActivity extends AppCompatActivity
                 return HomeFragment.newInstance();
             case TASK_SET:
                 return TaskSetFragment.newInstance();
-            case VISUALIZATION:
-                return VisualizationFragment.newInstance();
             default:
                 throw new IllegalStateException("Unknown ContentType "+contentType);
         }
@@ -226,8 +224,7 @@ public class MainActivity extends AppCompatActivity
      */
     private enum ContentType {
         HOME(R.id.nav_home),
-        TASK_SET(R.id.nav_task_set),
-        VISUALIZATION(R.id.nav_visualization);
+        TASK_SET(R.id.nav_task_set);
 
         /**
          * The identifier of the button in the navigation drawer that leads to a ContentType being
