@@ -45,7 +45,6 @@ public class TaskSetIO {
 
         JSONArray taskArray = object.getJSONArray(TASKS);
 
-
         for(int i = 0; i < taskArray.length(); ++i)
             tasks.add(TaskIO.fromJSON(taskArray.getJSONObject(i)));
 

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedWriter;
@@ -22,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
+import nl.tue.san.net.*;
 import nl.tue.san.util.ReadWriteSafeObject;
 
 /**
@@ -40,17 +42,17 @@ public class TaskSetManager extends ReadWriteSafeObject {
      */
     private static final String TASK_SETS_FILENAME = "root.tasksets";
 
-
     /**
      * Obtain an instance of the TaskSetManager. On the first call to this method the manager is
      * created. Therefore that first call may take more time than subsequent calls.
+     *
      * @param context The context in which the manager is used. This is required to be able to write
-     *                files to the internal storage. 
+     *                files to the internal storage.
      * @return The only instance of the TaskSetManager
      */
     public static TaskSetManager getInstance(Context context) {
 
-        if(instance==null)
+        if (instance == null)
             instance = new TaskSetManager(context);
         return instance;
     }
@@ -67,6 +69,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
 
     /**
      * Create a new TaskSetManager that uses the given File as a directory to store TaskSets in.
+     *
      * @param context The Context in which the Manager operates.
      */
     private TaskSetManager(Context context) {
@@ -74,18 +77,19 @@ public class TaskSetManager extends ReadWriteSafeObject {
         try {
             this.reload();
         } catch (Exception e) {
-            Log.d("TaskSetManager","Couldn't load tasksets from file "+this.root.getAbsolutePath()+
-                    " due to "+e.getClass().getSimpleName()+":  "+e.getMessage()+"." +
+            Log.d("TaskSetManager", "Couldn't load tasksets from file " + this.root.getAbsolutePath() +
+                    " due to " + e.getClass().getSimpleName() + ":  " + e.getMessage() + "." +
                     " Call reload on TaskSetManager to get full exception.");
         }
     }
 
     /**
      * Get the TaskSet with the given name.
+     *
      * @param name The name of the TaskSet.
      * @return The TaskSet with the given name, or null if there is no such TaskSet.
      */
-    public TaskSet get(final String name){
+    public TaskSet get(final String name) {
         return this.readOp(new Operation<TaskSet>() {
             @Override
             public TaskSet perform() {
@@ -96,11 +100,12 @@ public class TaskSetManager extends ReadWriteSafeObject {
 
     /**
      * Get the TaskSet located at index 0. The given index is expected to lie within the range [0,size).
+     *
      * @param index The index of the TaskSet to obtain
      * @return The TaskSet that was located at the given index.
      * @throws IndexOutOfBoundsException If the given index is out of bounds.
      */
-    public TaskSet get(final int index){
+    public TaskSet get(final int index) {
 
         return this.readOp(new Operation<TaskSet>() {
             @Override
@@ -112,9 +117,10 @@ public class TaskSetManager extends ReadWriteSafeObject {
 
     /**
      * Get the number of TaskSets managed by this TaskSetManager.
+     *
      * @return The number of TaskSets managed by this TaskSetManager. The returned value is never negative.
      */
-    public int size(){
+    public int size() {
         return this.readOp(new Operation<Integer>() {
             @Override
             public Integer perform() {
@@ -125,6 +131,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
 
     /**
      * Get the names of all TaskSets that are available.
+     *
      * @return A set containing the names of all available TaskSets. The returned Set may contain 0
      * elements but is never {@code null}.
      */
@@ -144,38 +151,39 @@ public class TaskSetManager extends ReadWriteSafeObject {
      * {@link IllegalStateException} is thrown. If the assertion is met, the method terminates
      * normally.
      */
-    private void assertAccess(){
-        if(root == null)
+    private void assertAccess() {
+        if (root == null)
             throw new IllegalStateException("Not allowed to access directory");
     }
 
     /**
      * Register the given TaskSet under this manager.
+     *
      * @param taskSet
      */
-    public void register(final TaskSet taskSet){
+    public void register(final TaskSet taskSet) {
         this.writeOp(new Operation<TaskSet>() {
             @Override
             public TaskSet perform() {
-                return taskSets.put(taskSet.getName(),taskSet);
+                return taskSets.put(taskSet.getName(), taskSet);
             }
         });
     }
 
     /**
      * Discard the given TaskSet.
+     *
      * @param taskSet
      * @return
      */
-    public boolean remove(final TaskSet taskSet){
+    public boolean remove(final TaskSet taskSet) {
         return this.writeOp(new Operation<Boolean>() {
             @Override
             public Boolean perform() {
-                if(taskSets.containsKey(taskSet.getName()) && taskSets.get(taskSet.getName()).equals(taskSet)) {
+                if (taskSets.containsKey(taskSet.getName()) && taskSets.get(taskSet.getName()).equals(taskSet)) {
                     taskSets.remove(taskSet.getName());
                     return true;
-                }
-                else
+                } else
                     return false;
             }
         });
@@ -184,7 +192,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
     /**
      * Remove all TaskSets.
      */
-    public void removeAll(){
+    public void removeAll() {
         this.writeOp(new Operation<Void>() {
             @Override
             public Void perform() {
@@ -197,30 +205,56 @@ public class TaskSetManager extends ReadWriteSafeObject {
     /**
      * Perform a reload of all TaskSets.
      */
-    public void reload() throws Exception{
+    public void reload() throws Exception {
         assertAccess();
 
-        // Here we read from a file, but we update this object. Therefore we use writeOp and not
-        // readOp.
         Exception exception = writeOp(new Operation<Exception>() {
-                   @Override
-                   public Exception perform() {
-                       try {
-                           unsafeReload();
-                           return null;
-                       } catch (JSONException | IOException e) {
-                           return e;
-                       }
-                   }
-               });
+            @Override
+            public Exception perform() {
+                try {
+                    unsafeReload();
+                    return null;
+                } catch (JSONException | IOException e) {
+                    return e;
+                }
+            }
+        });
 
-        if(exception != null)
-            throw exception;
+        if (exception != null)
+            this.loadFromServer();
+//            throw exception;
+    }
 
+    private void loadFromServer() {
+
+        final TaskSetManager that = this;
+
+        Server.GET("taskset", new Callback() {
+            @Override
+            public void onSuccess(String data) {
+                Log.i("Network", "Retrieved data: " + data);
+                try {
+                    JSONObject obj = new JSONObject(new JSONTokener(data));
+
+                    // Then convert each entry in the JSONArray to a TaskSet.
+                    that.register(TaskSetIO.fromJSON(obj));
+
+                } catch (Exception e) {
+                    Log.e("TaskSetManager", "Loading of taskset Failed inner", e);
+                    this.onFailure();
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e("TaskSetManager", "Loading of taskset Failed through callback");
+            }
+        });
     }
 
     /**
      * Performs a reload without synchronization.
+     *
      * @throws JSONException
      * @throws IOException
      */
@@ -230,12 +264,12 @@ public class TaskSetManager extends ReadWriteSafeObject {
         StringBuilder builder = new StringBuilder();
         try (Reader reader = new InputStreamReader(new FileInputStream(this.root))) {
             while (reader.ready())
-                builder.append((char)reader.read());
+                builder.append((char) reader.read());
         }
         JSONArray array = new JSONArray(new JSONTokener(builder.toString()));
 
         // Then convert each entry in the JSONArray to a TaskSet.
-        for(int i = 0; i < array.length(); ++i )
+        for (int i = 0; i < array.length(); ++i)
             this.register(TaskSetIO.fromJSON(array.getJSONObject(i)));
     }
 
@@ -246,7 +280,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
      */
     private void unsafeWrite() throws JSONException, IOException {
         JSONArray array = new JSONArray();
-        for(TaskSet taskSet : taskSets.values())
+        for (TaskSet taskSet : taskSets.values())
             array.put(TaskSetIO.toJSON(taskSet));
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.root)))) {
@@ -258,7 +292,7 @@ public class TaskSetManager extends ReadWriteSafeObject {
     /**
      * Write all TaskSets. This provides synchronization.
      */
-    public void write() throws Exception{
+    public void write() throws Exception {
         assertAccess();
 
         // To perform a write, we don't update this object. Instead we only read the properties of
@@ -275,16 +309,17 @@ public class TaskSetManager extends ReadWriteSafeObject {
             }
         });
 
-        if(exception != null)
+        if (exception != null)
             throw exception;
     }
 
     /**
      * Indicates the position at which the given taskset is stored.
+     *
      * @param taskSet
      * @return
      */
-    public int indexOf(TaskSet taskSet){
+    public int indexOf(TaskSet taskSet) {
         return new LinkedList<>(this.taskSets.values()).indexOf(taskSet);
     }
 }
