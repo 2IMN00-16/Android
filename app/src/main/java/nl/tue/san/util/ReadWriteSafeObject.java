@@ -24,7 +24,7 @@ public class ReadWriteSafeObject {
      * @param <T> The return type of the Operation.
      * @return The result of running the operation.
      */
-    protected <T> T readOp (Operation<T> operation){
+    public <T> T readOp (Operation<T> operation){
         return this.lockOp(operation, this.lock.readLock());
     }
 
@@ -37,7 +37,7 @@ public class ReadWriteSafeObject {
      * @param <T> The return type of the Operation.
      * @return The result of running the operation.
      */
-    protected <T> T writeOp (Operation<T> operation){
+    public <T> T writeOp (Operation<T> operation){
         return this.lockOp(operation, this.lock.writeLock());
     }
 
@@ -48,7 +48,7 @@ public class ReadWriteSafeObject {
      * @param <T>
      * @return
      */
-    private <T> T lockOp(Operation<T> operation, Lock lock){
+    public <T> T lockOp(Operation<T> operation, Lock lock){
         try {
             lock.lock();
             return operation.perform();
@@ -61,7 +61,7 @@ public class ReadWriteSafeObject {
      * Simple interface to allow for the definition of arbitrary operations, while being Java 7 compliant.
      * @param <T> The return type of the operation.
      */
-    protected interface Operation<T> {
+    public interface Operation<T> {
         T perform();
     }
 }
