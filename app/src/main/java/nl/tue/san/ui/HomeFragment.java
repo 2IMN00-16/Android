@@ -5,8 +5,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import nl.tue.san.sanseminar.R;
+import nl.tue.san.tasks.TaskSetManager;
+import nl.tue.san.visualization.Visualization;
+import nl.tue.san.visualization.VisualizationManager;
 
 
 /**
@@ -15,6 +25,13 @@ import nl.tue.san.sanseminar.R;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment implements Navigatable {
+
+
+    private VisualizationManager manager;
+    private TaskSetManager taskSetManager;
+
+    private Spinner scheduler, taskSet;
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -28,7 +45,64 @@ public class HomeFragment extends Fragment implements Navigatable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+
+        this.manager = VisualizationManager.getInstance(this.getContext());
+        this.taskSetManager = TaskSetManager.getInstance(this.getContext());
+
+        View inflated = inflater.inflate(R.layout.fragment_home, container, false);
+
+        this.scheduler = (Spinner)inflated.findViewById(R.id.scheduler_spinner);
+        this.taskSet = (Spinner)inflated.findViewById(R.id.task_set_spinner);
+
+        display();
+
+        return inflated;
+    }
+
+    private void display(){
+
+        final Visualization visualization = manager.getVisualization();
+
+        /*
+         * Update the TaskSet spinner
+         */
+        {
+            // First get all available tasks and sort them
+            List<String> taskSets = new LinkedList<>(this.taskSetManager.stored());
+            Collections.sort(taskSets);
+
+            // Then create basic adapter
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, taskSets);
+            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            // Then apply
+            this.taskSet.setAdapter(spinnerArrayAdapter);
+        }
+
+
+        /*
+         * Update the Scheduler
+         */
+        {
+            // Get all schedulers and sort.
+            List<String> schedulers = Arrays.asList("FPPS","FPTS","FPNS");
+            Collections.sort(schedulers);
+
+            // Then create basic adapter
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, schedulers);
+            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            // Then apply
+            this.scheduler.setAdapter(spinnerArrayAdapter);
+        }
+    }
+
+
+    /**
+     * Call to start the visualization
+     */
+    private void startVisualization() {
+
     }
 
     /**
@@ -41,6 +115,11 @@ public class HomeFragment extends Fragment implements Navigatable {
 
     private final Navigatable.Properties properties = new Navigatable.Properties.Builder()
                                                                 .useTitle(R.string.nav_title_home)
+                                                                .useFabIcon(R.drawable.ic_play_arrow)
+                                                                .useFabHandler(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) { startVisualization(); }
+            })
                                                                 .build();
 
 }
