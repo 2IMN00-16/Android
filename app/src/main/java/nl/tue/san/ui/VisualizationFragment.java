@@ -162,7 +162,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
      * Send out a request to the server to identify all lights.
      */
     private void requestIdentifyLights() {
-        this.manager.requestIdentification(3000);
+        this.manager.requestIdentification(5000);
     }
 
     /**
