@@ -161,6 +161,11 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
         return map;
     }
 
+    @Override
+    protected LinkedHashMap<String, TaskSet> initialObject() {
+        return new LinkedHashMap<>();
+    }
+
     /**
      * Register the given TaskSet under this manager.
      *
