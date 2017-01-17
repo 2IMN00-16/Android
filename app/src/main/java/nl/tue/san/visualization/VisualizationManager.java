@@ -44,7 +44,7 @@ public class VisualizationManager extends Manager<Visualization> {
     /**
      * Set containing all possible visualizations that can be applied to a light.
      */
-    private Set<String> visualizations;
+    private final Set<String> visualizations = new HashSet<>();
 
     /**
      * Indicates the end of the most recent request to identify the lights. This indicates the time
@@ -158,15 +158,27 @@ public class VisualizationManager extends Manager<Visualization> {
      * visualizations are available on the server.
      */
     public void synchronizeVisualizations(){
-        final Collection<String> visualizations = new HashSet<>();
-
-        // Do the following writeOp call async
-        this.writeOp(new Operation<Void>() {
+        Server.GET("visualizations", new Callback() {
             @Override
-            public Void perform() {
-                VisualizationManager.instance.visualizations.clear();
-                VisualizationManager.instance.visualizations.addAll(visualizations);
-                return null;
+            public void onSuccess(final String data) {
+                VisualizationManager.this.writeOp(new Operation<Void>() {
+                    @Override
+                    public Void perform() {
+                        try {
+                            final JSONArray lamps = new JSONArray(data);
+                            VisualizationManager.instance.visualizations.clear();
+                            for(int i = 0 ; i <lamps.length(); ++i)
+                                VisualizationManager.instance.visualizations.add(lamps.getString(i));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
             }
         });
     }
