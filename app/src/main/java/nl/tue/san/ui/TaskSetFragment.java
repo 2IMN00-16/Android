@@ -107,7 +107,7 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return view instanceof ListView && ((TaskAdapter)((ListView)view).getAdapter()).taskSet.equals(object);
+            return object == view;
         }
 
         @Override
@@ -117,31 +117,34 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeAllViews();
+            container.removeView((View) object);
+            ((ListView)object).setAdapter(null);
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-
-            TaskSet displayed = taskSetManager.get(position);
-
             ListView listView = new ListView(getContext());
             listView.setAdapter(new TaskAdapter(taskSetManager.get(position)));
             container.addView(listView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
+            return listView;
+        }
 
-            return displayed;
+        @Override
+        public int getItemPosition(Object object) {
+            TaskSet displayed = ((TaskAdapter) ((ListView) object).getAdapter()).taskSet;
+
+            int index = taskSetManager.indexOf(displayed);
+            return index >= 0 ? index : POSITION_NONE;
         }
 
         @Override
         public void onTaskSetAdded(TaskSet taskSet) {
-            Log.d("TaskSetFragment.Adapter", "Called onTaskSetAdded: "+taskSet.getName());
             this.notifyDataSetChanged();
         }
 
         @Override
         public void onTaskSetRemoved(TaskSet taskSet) {
-            Log.d("TaskSetFragment.Adapter", "Called onTaskSetRemoved: "+taskSet.getName());
             this.notifyDataSetChanged();
         }
     }
