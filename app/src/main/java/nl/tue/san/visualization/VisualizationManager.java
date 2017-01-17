@@ -222,14 +222,6 @@ public class VisualizationManager extends Manager<Visualization> {
         return new Visualization();
     }
 
-    public long getEndOfRecentIdentification() {
-        return endOfRecentIdentification;
-    }
-
-    public Map<String, Integer> getMappingOfRecentIdentification() {
-        return mappingOfRecentIdentification;
-    }
-
     /**
      * Start a new identification.
      * @param lightToColors THe mapping to use to identify lights
@@ -246,7 +238,7 @@ public class VisualizationManager extends Manager<Visualization> {
         this.mappingOfRecentIdentification = lightToColors;
 
         for(OnVisualizationPropertiesChangeListener listener : listeners)
-            listener.onIdentificationStarted(mappingOfRecentIdentification, endOfRecentIdentification);
+            listener.onIdentificationStarted(lightToColors, duration);
     }
 
     /**
@@ -255,6 +247,9 @@ public class VisualizationManager extends Manager<Visualization> {
      */
     public void addListener(OnVisualizationPropertiesChangeListener listener) {
         this.listeners.add(listener);
+        final long identificationTime = this.endOfRecentIdentification - System.currentTimeMillis();
+        if(identificationTime > 0)
+            listener.onIdentificationStarted(this.mappingOfRecentIdentification, identificationTime);
     }
 
 
@@ -274,7 +269,7 @@ public class VisualizationManager extends Manager<Visualization> {
 
         void onAvailableVisualizationsChange();
 
-        void onIdentificationStarted(Map<String, Integer> mappingOfRecentIdentification, long endOfRecentIdentification);
+        void onIdentificationStarted(Map<String, Integer> lightsToColors, long endTime);
     }
 
     /**
