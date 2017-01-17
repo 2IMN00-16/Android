@@ -120,20 +120,28 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         super.onPause();
 
         try {
-            // update visualization
-            Visualization visualization = this.manager.getVisualization();
-
-            visualization.setCycleRate(getCycleRateInput());
-            visualization.setTimeScale(getTimeScaleInput());
-
-            for(LightVisualizationView view : lightVisualizationViews)
-                visualization.set(view.getLight(), view.getSelectedVisualization());
-
-            // Finally save everything
-            this.manager.write();
+           this.save();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Save the current state
+     * @throws Exception
+     */
+    private void save() throws Exception {
+        // update visualization
+        Visualization visualization = this.manager.getVisualization();
+
+        visualization.setCycleRate(getCycleRateInput());
+        visualization.setTimeScale(getTimeScaleInput());
+
+        for(LightVisualizationView view : lightVisualizationViews)
+            visualization.set(view.getLight(), view.getSelectedVisualization());
+
+        // Finally save everything
+        this.manager.write();
     }
 
     /**
