@@ -12,6 +12,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import nl.tue.san.sanseminar.R;
 import nl.tue.san.visualization.Visualization;
@@ -32,6 +35,11 @@ public class VisualizationFragment extends Fragment implements Navigatable {
 
     private List<LightVisualizationView> lightVisualizationViews;
 
+    /**
+     * Timer that will hide the identifying color on each LightVisualizationView once it's task is
+     * completed.
+     */
+    private Timer hideTimer;
 
 
     public VisualizationFragment() {
@@ -144,6 +152,67 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         this.manager.write();
     }
 
+
+    /**
+     * Send out a request to the server to identify all lights.
+     */
+    private void requestIdentifyLights() {
+
+    }
+
+    /**
+     * Identify the lights by mapping each light to a color, and displaying that color for the given
+     * amount of time.
+     * @param lightsToColor A mapping that maps the name of a light to a color integer to use as the
+     *                      color to display the light.
+     * @param time The amount of time for which to display the color on each light before hidin it
+     *             again.
+     */
+    protected void identify(final Map<String, Integer> lightsToColor, long time){
+
+        // cancel the current "hide" timer
+        synchronized (this) {
+            if (this.hideTimer != null)
+                this.hideTimer.cancel();
+
+            for(final LightVisualizationView lightVisualizationView : this.lightVisualizationViews){
+                String light = lightVisualizationView.getLight();
+                if(lightsToColor.containsKey(light)){
+                    lightVisualizationView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            lightVisualizationView.showIdentifyingColor(lightsToColor.get(lightVisualizationView.getLight()));
+                        }
+                    });
+                }
+            }
+
+            // start the new hide timer
+            this.hideTimer = new Timer();
+            this.hideTimer.schedule(new TimerTask(){
+
+                /**
+                 * The action to be performed by this timer task.
+                 */
+                @Override
+                public void run() {
+
+                    for(final LightVisualizationView lightVisualizationView : VisualizationFragment.this.lightVisualizationViews) {
+                        lightVisualizationView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                lightVisualizationView.hideIdentifyingColor();
+                            }
+                        });
+                    }
+                    synchronized (VisualizationFragment.this) {
+                        VisualizationFragment.this.hideTimer = null;
+                    }
+                }
+            }, time);
+        }
+    }
+
     /**
      * Gets the properties for navigation purposes.
      */
@@ -154,6 +223,13 @@ public class VisualizationFragment extends Fragment implements Navigatable {
 
     private final Navigatable.Properties properties = new Navigatable.Properties.Builder()
             .useTitle(R.string.nav_title_visualization)
+            .useFabIcon(R.drawable.ic_lightbulb)
+            .useFabHandler(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    VisualizationFragment.this.requestIdentifyLights();
+                }
+            })
             .build();
 
 }
