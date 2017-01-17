@@ -10,5 +10,9 @@
             android:id="@+id/nav_task_set"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/nav_title_task_set" />
+        <item
+            android:id="@+id/nav_visualization"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/nav_title_visualization" />
     </group>
 </menu>
