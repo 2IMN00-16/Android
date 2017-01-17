@@ -32,12 +32,29 @@ public abstract class Manager<T>  {
     protected Manager(File file){
         this();
         this.setFile(file);
+
         try {
             this.reload();
         } catch (Exception e) {
-            Log.d(this.getClass().getName(),"Couldn't load visualization from file "+this.file.getAbsolutePath()+
-                    " due to "+e.getClass().getSimpleName()+":  "+e.getMessage()+"." +
-                    " Call reload on "+this.getClass().getName()+" to get full exception.");
+
+            this.managed = initialObject();
+            try {
+                this.write();
+
+                Log.d(this.getClass().getName(),"Couldn't load visualization from file "+this.file.getAbsolutePath()+" due to exception: ");
+                e.printStackTrace();
+                Log.d(this.getClass().getName(),"Using initial object instead");
+
+            } catch (Exception e1) {
+                Log.d(this.getClass().getName(), "Failed to write initial object to file after already failing to load. ");
+                Log.d(this.getClass().getName(), "Exception that occurred when we tried to reload:");
+                e.printStackTrace();
+                Log.d(this.getClass().getName(), "Exception that occurred when we tried to write the initial object:");
+                e1.printStackTrace();
+
+                throw new RuntimeException(e1);
+            }
+
         }
 
     }
