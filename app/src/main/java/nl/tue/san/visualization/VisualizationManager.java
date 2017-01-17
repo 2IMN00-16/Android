@@ -2,16 +2,18 @@ package nl.tue.san.visualization;
 
 import android.content.Context;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import nl.tue.san.net.Callback;
+import nl.tue.san.net.Server;
 import nl.tue.san.util.Manager;
 import nl.tue.san.util.ReadWriteSafeObject.Operation;
 
@@ -37,7 +39,7 @@ public class VisualizationManager extends Manager<Visualization> {
     /**
      * Set containing all available lights.
      */
-    private Set<String> lights;
+    private final Set<String> lights = new HashSet<>();
 
     /**
      * Set containing all possible visualizations that can be applied to a light.
@@ -127,15 +129,27 @@ public class VisualizationManager extends Manager<Visualization> {
      */
     public void synchronizeLights(){
 
-        final Collection<String> lights = new HashSet<>();
-
-        // Do the following writeOp call async
-        this.writeOp(new Operation<Void>() {
+        Server.GET("lamps", new Callback() {
             @Override
-            public Void perform() {
-                VisualizationManager.instance.lights.clear();
-                VisualizationManager.instance.lights.addAll(lights);
-                return null;
+            public void onSuccess(final String data) {
+                VisualizationManager.this.writeOp(new Operation<Void>() {
+                    @Override
+                    public Void perform() {
+                        try {
+                            final JSONArray lamps = new JSONArray(data);
+                            VisualizationManager.instance.lights.clear();
+                            for(int i = 0 ; i <lamps.length(); ++i)
+                                VisualizationManager.instance.lights.add(lamps.getString(i));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
             }
         });
     }
