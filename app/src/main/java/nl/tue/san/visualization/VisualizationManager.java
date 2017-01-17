@@ -111,6 +111,7 @@ public class VisualizationManager extends Manager<Visualization> {
      */
     private VisualizationManager(Context context) {
         super(new File(context.getFilesDir(), VISUALIZATION_FILENAME));
+        this.synchronize();
     }
 
     /**
