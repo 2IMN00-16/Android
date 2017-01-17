@@ -162,7 +162,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
      * Send out a request to the server to identify all lights.
      */
     private void requestIdentifyLights() {
-        this.manager.requestIdentification(this, 3000);
+        this.manager.requestIdentification(3000);
     }
 
     /**
@@ -248,9 +248,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
     }
 
     @Override
-    public void onIdentificationStarted() {
-        long identificationEnd = this.manager.getEndOfRecentIdentification();
-        if(identificationEnd > System.currentTimeMillis())
-            this.identify(this.manager.getMappingOfRecentIdentification(), identificationEnd - System.currentTimeMillis());
+    public void onIdentificationStarted(Map<String, Integer> lightToColors, long duration) {
+        this.identify(lightToColors, duration);
     }
 }
