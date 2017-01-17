@@ -145,8 +145,11 @@ public class VisualizationManager extends Manager<Visualization> {
                             e.printStackTrace();
                         }
                         return null;
+
                     }
                 });
+                for(OnVisualizationPropertiesChangeListener listener : VisualizationManager.this.listeners)
+                    listener.onAvailableLightsChange();
             }
 
             @Override
@@ -176,6 +179,8 @@ public class VisualizationManager extends Manager<Visualization> {
                         return null;
                     }
                 });
+                for(OnVisualizationPropertiesChangeListener listener : VisualizationManager.this.listeners)
+                    listener.onAvailableVisualizationsChange();
             }
 
             @Override
