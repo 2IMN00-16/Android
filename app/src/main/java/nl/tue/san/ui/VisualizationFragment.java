@@ -33,7 +33,7 @@ public class VisualizationFragment extends Fragment implements Navigatable {
     private EditText timeScale, cycleRate;
     private LinearLayout lightsContainer;
 
-    private List<LightVisualizationView> lightVisualizationViews;
+    private List<LightVisualizationView> lightVisualizationViews = new LinkedList<>();
 
     /**
      * Timer that will hide the identifying color on each LightVisualizationView once it's task is
@@ -63,9 +63,6 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         this.timeScale = (EditText)inflated.findViewById(R.id.time_scale);
         this.cycleRate = (EditText)inflated.findViewById(R.id.cycle_rate);
 
-        this.lightVisualizationViews = new LinkedList<>();
-
-
         display();
 
         return inflated;
@@ -79,27 +76,32 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         /*
          * Update the lights
          */
-        {
-            List<String> lights = new LinkedList<>(VisualizationManager.getInstance().getLights());
-            Collections.sort(lights);
+        this.lightVisualizationViews.clear();
+        this.lightsContainer.removeAllViews();
 
-            List<String> visualizationOptions = new LinkedList<>(VisualizationManager.getInstance().getVisualizations());
-            Collections.sort(visualizationOptions);
+        List<String> lights = new LinkedList<>(VisualizationManager.getInstance().getLights());
+        Collections.sort(lights);
 
+        List<String> visualizationOptions = new LinkedList<>(VisualizationManager.getInstance().getVisualizations());
+        Collections.sort(visualizationOptions);
 
-
-            for(String light : lights) {
-                LightVisualizationView view = new LightVisualizationView(this.getContext());
-                view.setName(light);
-                view.showVisualizationOptions(visualization.getMapping(light), visualizationOptions);
-                this.lightsContainer.addView(view);
-                this.lightVisualizationViews.add(view);
-            }
+        for(String light : lights) {
+            LightVisualizationView view = new LightVisualizationView(this.getContext());
+            view.setName(light);
+            view.showVisualizationOptions(visualization.getMapping(light), visualizationOptions);
+            this.lightsContainer.addView(view);
+            this.lightVisualizationViews.add(view);
         }
 
+        /*
+         * Update the cycle rate
+         */
         this.cycleRate.setText(String.format(Locale.getDefault(), "%d",visualization.getCycleRate()));
         this.cycleRate.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_CYCLE_RATE));
 
+        /*
+         * Update the time scale
+         */
         this.timeScale.setText(String.format(Locale.getDefault(), "%d",visualization.getTimeScale()));
         this.timeScale.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_TIME_SCALE));
 
