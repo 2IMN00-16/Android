@@ -78,20 +78,32 @@ public abstract class Manager<T>  {
     protected abstract T initialObject();
 
     /**
-     * Asserts that access has been given to the required directory. If access was not given, an
-     * {@link IllegalStateException} is thrown. If the assertion is met, the method terminates
-     * normally.
+     * Asserts that the file to which we want to write is set, and thus we have write access. If
+     * access was not given, an {@link IllegalStateException} is thrown. If the assertion is met,
+     * the method terminates normally.
+     * @throws IllegalStateException If the assertion is not met
      */
-    private void assertAccess(){
-        if(file == null)
+    private void assertWriteAccess(){
+        if(file == null )
             throw new IllegalStateException("Can't access file to write to");
     }
 
+
+    /**
+     * Asserts that the file from which we want to read exists, and thus we have read access. If
+     * access was not given, an {@link IllegalStateException} is thrown. If the assertion is met,
+     * the method terminates normally.
+     * @throws IllegalStateException If the assertion is not met
+     */
+    private void assertReadAccess(){
+        if(file == null || !file.exists())
+            throw new IllegalStateException("Can't access file to write to");
+    }
     /**
      * Perform a reload of all TaskSets.
      */
     public void reload() throws Exception{
-        assertAccess();
+        assertReadAccess();
 
         // Convert the root file into a String
         StringBuilder builder = new StringBuilder();
@@ -162,7 +174,7 @@ public abstract class Manager<T>  {
      * Write all TaskSets. This provides synchronization.
      */
     public void write() throws Exception{
-        assertAccess();
+        assertWriteAccess();
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.file)))) {
             writer.write(this.writeAsReturn());
