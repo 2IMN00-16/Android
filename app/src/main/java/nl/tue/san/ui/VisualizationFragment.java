@@ -102,6 +102,11 @@ public class VisualizationFragment extends Fragment implements Navigatable {
 
         this.timeScale.setText(String.format(Locale.getDefault(), "%d",visualization.getTimeScale()));
         this.timeScale.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_TIME_SCALE));
+
+        // If we are currently in a situation in which we're identifying lights, display it.
+        long identificationEnd = this.manager.getEndOfRecentIdentification();
+        if(identificationEnd > System.currentTimeMillis())
+            this.identify(this.manager.getMappingOfRecentIdentification(), identificationEnd - System.currentTimeMillis());
     }
 
     private long getCycleRateInput(){

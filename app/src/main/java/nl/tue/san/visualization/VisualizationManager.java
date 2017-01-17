@@ -9,6 +9,7 @@ import org.json.JSONTokener;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import nl.tue.san.util.Manager;
@@ -37,6 +38,25 @@ public class VisualizationManager extends Manager<Visualization> {
      * Set containing all possible visualizations that can be applied to a light.
      */
     private Set<String> visualizations;
+
+    /**
+     * Indicates the end of the most recent request to identify the lights. This indicates the time
+     * in milliseconds at which the identification is stopped. If this lies in the future, then the
+     * identification is ongoing. If it lies in the past then it has stopped. Along with this
+     * identification the mapping specified in {@link #mappingOfRecentIdentification} was used.
+     * @see #mappingOfRecentIdentification
+     */
+    private long endOfRecentIdentification = 0;
+
+    /**
+     * Indicates how lights were mapped to colors on the most recent request to identify the lights.
+     * If the associated end time, represented by {@link #endOfRecentIdentification}, lies in the
+     * future, then this mapping should be used. If it lies in the past then it has stopped.
+     * Additionally, if the associated end time lies in the past, then this value may be null.
+     * As long as the end time is still in the future, this value will not be null.
+     * @see #endOfRecentIdentification
+     */
+    private Map<String, Integer> mappingOfRecentIdentification;
 
     public Set<String> getLights() {
         return this.readOp(new Operation<Set<String>>() {
@@ -186,5 +206,29 @@ public class VisualizationManager extends Manager<Visualization> {
     @Override
     protected Visualization unmarshall(String content) throws JSONException {
         return VisualizationIO.fromJSON(new JSONObject(new JSONTokener(content)));
+    }
+
+    public long getEndOfRecentIdentification() {
+        return endOfRecentIdentification;
+    }
+
+    public Map<String, Integer> getMappingOfRecentIdentification() {
+        return mappingOfRecentIdentification;
+    }
+
+    /**
+     * Start a new identification.
+     * @param lightToColors THe mapping to use to identify lights
+     * @param duration The amount of time for which this identification will be on going. Must
+     *                 be positive.
+     */
+    public void startIdentification(Map<String, Integer> lightToColors, long duration) {
+        if(lightToColors == null)
+            throw new IllegalArgumentException("Mapping is required");
+        if(duration < 0)
+            throw new IllegalArgumentException("Duration must be positive");
+
+        this.endOfRecentIdentification = System.currentTimeMillis() + duration;
+        this.mappingOfRecentIdentification = lightToColors;
     }
 }
