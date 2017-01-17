@@ -123,4 +123,13 @@ public class Visualization {
     public static final long DEFAULT_TIME_SCALE = 50;
 
 
+    /**
+     * Get the mapping for the specified light
+     * @param light The light for which to get the mapping
+     * @return The visualization that should be used for the given light. May return null, which
+     * indicates that it should display nothing.
+     */
+    public String getMapping(String light) {
+        return this.lightVisualization.get(light);
+    }
 }
