@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -77,14 +78,44 @@ public class TaskSetFragment extends Fragment implements Navigatable {
                                                                         createNewTask();
                                                                     }
                                                                 })
+                                                                .useMenu(R.menu.menu_task_set)
                                                                 .build();
+
+    /**
+     * Get the current TaskSet.
+     * @return The TaskSet that is currently displaying.
+     */
+    private TaskSet current(){
+        return taskSetManager.get(this.viewPager.getCurrentItem());
+    }
+
+    /**
+     * Create a new TaskSet under the given name.
+     */
+    private void createNewTaskSet(String taskSetName){
+        TaskSet taskSet = new TaskSet(taskSetName);
+        this.taskSetManager.register(taskSet);
+    }
+
+    /**
+     * Prompt the user to create a new task set
+     */
+    private void requestCreateNewTaskSet(){
+        createNewTaskSet(""+System.currentTimeMillis());
+    }
+
+    /**
+     * Remove the current taskSet.
+     */
+    private void deleteCurrentTaskset(){
+        this.taskSetManager.remove(this.current());
+    }
 
     /**
      * Creates a new Task in the currently displaying TaskSet.
      */
     private void createNewTask() {
-        TaskSet currentlyDisplayed = taskSetManager.get(this.viewPager.getCurrentItem());
-        this.createOrModify(currentlyDisplayed, null);
+        this.createOrModify(current(), null);
     }
 
 
@@ -93,6 +124,20 @@ public class TaskSetFragment extends Fragment implements Navigatable {
         intent.putExtra(TaskActivity.INTENT_EXTRA_TASK, taskName);
         intent.putExtra(TaskActivity.INTENT_EXTRA_TASKSET, taskSet.getName());
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+            case R.id.menu_task_set_create:
+                requestCreateNewTaskSet(); return true;
+            case R.id.menu_task_set_delete:
+                deleteCurrentTaskset();
+                return true;
+        }
+        return false;
+
     }
 
     /**
