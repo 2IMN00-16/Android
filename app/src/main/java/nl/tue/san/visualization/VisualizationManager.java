@@ -208,6 +208,11 @@ public class VisualizationManager extends Manager<Visualization> {
         return VisualizationIO.fromJSON(new JSONObject(new JSONTokener(content)));
     }
 
+    @Override
+    protected Visualization initialObject() {
+        return new Visualization();
+    }
+
     public long getEndOfRecentIdentification() {
         return endOfRecentIdentification;
     }

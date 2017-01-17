@@ -75,6 +75,8 @@ public abstract class Manager<T>  {
      */
     protected abstract T unmarshall(String content) throws Exception;
 
+    protected abstract T initialObject();
+
     /**
      * Asserts that access has been given to the required directory. If access was not given, an
      * {@link IllegalStateException} is thrown. If the assertion is met, the method terminates
