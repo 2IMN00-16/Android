@@ -145,9 +145,12 @@ public class TaskSetFragment extends Fragment implements Navigatable {
      */
     private final class TaskSetAdapter extends PagerAdapter implements TaskSetManager.OnTaskSetsChangedListener {
 
+        private int count = taskSetManager.size();
         @Override
         public int getCount() {
-            return taskSetManager.size();
+            synchronized (this){
+                return count;
+            }
         }
 
         @Override
@@ -185,12 +188,18 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
         @Override
         public void onTaskSetAdded(TaskSet taskSet) {
-            this.notifyDataSetChanged();
+            synchronized (this) {
+                this.count = taskSetManager.size();
+                this.notifyDataSetChanged();
+            }
         }
 
         @Override
         public void onTaskSetRemoved(TaskSet taskSet) {
-            this.notifyDataSetChanged();
+            synchronized (this){
+                this.count = taskSetManager.size();
+                this.notifyDataSetChanged();
+            }
         }
     }
 
