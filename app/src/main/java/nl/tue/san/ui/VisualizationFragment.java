@@ -26,7 +26,7 @@ import nl.tue.san.visualization.VisualizationManager;
  * Use the {@link VisualizationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class VisualizationFragment extends Fragment implements Navigatable {
+public class VisualizationFragment extends Fragment implements Navigatable, VisualizationManager.OnVisualizationPropertiesChangeListener {
 
     private VisualizationManager manager;
 
@@ -64,6 +64,8 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         this.cycleRate = (EditText)inflated.findViewById(R.id.cycle_rate);
 
         display();
+
+        this.manager.addListener(this);
 
         return inflated;
     }
@@ -105,10 +107,6 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         this.timeScale.setText(String.format(Locale.getDefault(), "%d",visualization.getTimeScale()));
         this.timeScale.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_TIME_SCALE));
 
-        // If we are currently in a situation in which we're identifying lights, display it.
-        long identificationEnd = this.manager.getEndOfRecentIdentification();
-        if(identificationEnd > System.currentTimeMillis())
-            this.identify(this.manager.getMappingOfRecentIdentification(), identificationEnd - System.currentTimeMillis());
     }
 
     private long getCycleRateInput(){
@@ -133,7 +131,7 @@ public class VisualizationFragment extends Fragment implements Navigatable {
     @Override
     public void onPause() {
         super.onPause();
-
+        this.manager.removeListener(this);
         try {
            this.save();
         } catch (Exception e) {
@@ -239,4 +237,20 @@ public class VisualizationFragment extends Fragment implements Navigatable {
             })
             .build();
 
+    @Override
+    public void onAvailableLightsChange() {
+        this.display();
+    }
+
+    @Override
+    public void onAvailableVisualizationsChange() {
+        this.display();
+    }
+
+    @Override
+    public void onIdentificationStarted() {
+        long identificationEnd = this.manager.getEndOfRecentIdentification();
+        if(identificationEnd > System.currentTimeMillis())
+            this.identify(this.manager.getMappingOfRecentIdentification(), identificationEnd - System.currentTimeMillis());
+    }
 }
