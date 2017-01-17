@@ -30,6 +30,11 @@ public class VisualizationManager extends Manager<Visualization> {
     private static VisualizationManager instance;
 
     /**
+     * All OnVisualizationPropertiesChangeListeners registered on this manager.
+     */
+    private final Set<OnVisualizationPropertiesChangeListener> listeners = new HashSet<>();
+
+    /**
      * Set containing all available lights.
      */
     private Set<String> lights;
@@ -235,5 +240,34 @@ public class VisualizationManager extends Manager<Visualization> {
 
         this.endOfRecentIdentification = System.currentTimeMillis() + duration;
         this.mappingOfRecentIdentification = lightToColors;
+    }
+
+
+    /**
+     * Add the given listener as a listener for visualization property changes.
+     * @param listener The listener to register.
+     */
+    public void addListener(OnVisualizationPropertiesChangeListener listener) {
+        this.listeners.add(listener);
+    }
+
+
+    /**
+     * Remove the given listener as a listener for visualization property changes.
+     * @param listener The listener to remove.
+     */
+    public void removeListener(OnVisualizationPropertiesChangeListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    /**
+     * Listener for some changes on the manager itself.
+     */
+    public interface OnVisualizationPropertiesChangeListener {
+        void onAvailableLightsChange();
+
+        void onAvailableVisualizationsChange();
+
+        void onIdentificationStarted();
     }
 }
