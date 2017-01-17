@@ -16,7 +16,6 @@ import java.util.Set;
 
 import nl.tue.san.net.Callback;
 import nl.tue.san.net.Server;
-import nl.tue.san.ui.VisualizationFragment;
 import nl.tue.san.util.Manager;
 import nl.tue.san.util.ReadWriteSafeObject.Operation;
 
@@ -245,6 +244,9 @@ public class VisualizationManager extends Manager<Visualization> {
 
         this.endOfRecentIdentification = System.currentTimeMillis() + duration;
         this.mappingOfRecentIdentification = lightToColors;
+
+        for(OnVisualizationPropertiesChangeListener listener : listeners)
+            listener.onIdentificationStarted(mappingOfRecentIdentification, endOfRecentIdentification);
     }
 
     /**
@@ -272,17 +274,14 @@ public class VisualizationManager extends Manager<Visualization> {
 
         void onAvailableVisualizationsChange();
 
-        void onIdentificationStarted();
+        void onIdentificationStarted(Map<String, Integer> mappingOfRecentIdentification, long endOfRecentIdentification);
     }
 
     /**
      * Request that the lights are identifiable for the given duration
-     * @param fragment The {@link VisualizationFragment} that requested the visualization. This
-     *                 fragment is notified if the identification was sucessful. May be null to
-     *                 indicate that there is no {@link VisualizationFragment} to notify.
      * @param duration The duration in milliseconds for which the lights should be identifiable.
      */
-    public void requestIdentification(final VisualizationFragment fragment, final long duration) {
+    public void requestIdentification(final long duration) {
         Server.POST("identify", new Callback() {
             @Override
             public void onSuccess(String data) {
@@ -299,8 +298,8 @@ public class VisualizationManager extends Manager<Visualization> {
                     }
 
                     startIdentification(mapping, duration);
-                    if(fragment != null)
-                        fragment.identify(mapping, duration);
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
