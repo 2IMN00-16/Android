@@ -28,6 +28,7 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
     private TaskSetManager taskSetManager = TaskSetManager.getInstance(this.getContext());
     private ViewPager viewPager;
+    private TaskSetAdapter adapter;
 
     public TaskSetFragment() {
         // Required empty public constructor
@@ -44,9 +45,19 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
         this.viewPager = (ViewPager) inflater.inflate(R.layout.fragment_task_set, container, false);
 
-        viewPager.setAdapter(new TaskSetAdapter());
+        this.adapter = new TaskSetAdapter();
+        this.viewPager.setAdapter(this.adapter);
+        this.taskSetManager.addOnTaskSetsChangedListener(this.adapter);
 
         return viewPager;
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        // remove the listener to prevent it from staying alive.
+        this.taskSetManager.removeOnTaskSetsChangedListener(this.adapter);
+        this.adapter = null;
     }
 
     /**
@@ -87,7 +98,7 @@ public class TaskSetFragment extends Fragment implements Navigatable {
     /**
      * PagerAdapter that creates a page for each TaskSet.
      */
-    private final class TaskSetAdapter extends PagerAdapter {
+    private final class TaskSetAdapter extends PagerAdapter implements TaskSetManager.OnTaskSetsChangedListener {
 
         @Override
         public int getCount() {
@@ -120,6 +131,18 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
 
             return displayed;
+        }
+
+        @Override
+        public void onTaskSetAdded(TaskSet taskSet) {
+            Log.d("TaskSetFragment.Adapter", "Called onTaskSetAdded: "+taskSet.getName());
+            this.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onTaskSetRemoved(TaskSet taskSet) {
+            Log.d("TaskSetFragment.Adapter", "Called onTaskSetRemoved: "+taskSet.getName());
+            this.notifyDataSetChanged();
         }
     }
 
