@@ -3,6 +3,8 @@ package nl.tue.san.visualization;
 import android.content.Context;
 
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.File;
 import java.util.Collection;
@@ -171,14 +173,18 @@ public class VisualizationManager extends Manager<Visualization> {
         return getInstance();
     }
 
+    public Visualization getVisualization(){
+        return this.managed();
+    }
+
 
     @Override
     protected String marshall(Visualization object) throws JSONException {
-        return null;//VisualizationIO.toJSON(object).toString();
+        return VisualizationIO.toJSON(object).toString();
     }
 
     @Override
     protected Visualization unmarshall(String content) throws JSONException {
-        return null;//VisualizationIO.fromJSON(new JSONObject(new JSONTokener(content)));
+        return VisualizationIO.fromJSON(new JSONObject(new JSONTokener(content)));
     }
 }
