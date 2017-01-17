@@ -2,19 +2,11 @@ package nl.tue.san.visualization;
 
 import java.util.HashMap;
 
-import nl.tue.san.tasks.TaskSet;
-
 /**
  * Created by Maurice on 13-1-2017.
  */
 
 public class Visualization {
-
-    /**
-     * The Selected TaskSet. Set this to null to indicate "what's on the server". Set it to a specific value to select the TaskSet locally.
-     */
-    private TaskSet taskSet;
-
 
     /**
      * Mapping that maps a light to a visualization.
@@ -37,23 +29,6 @@ public class Visualization {
     public Visualization(){
         this.timeScale = DEFAULT_TIME_SCALE;
         this.cycleRate = DEFAULT_CYCLE_RATE;
-    }
-
-    /**
-     * The TaskSet that is visualized.
-     * @return The TaskSet that is visualized. May be null, indicating "whatever is on the server".
-     */
-    public TaskSet getTaskSet() {
-        return taskSet;
-    }
-
-    /**
-     * The TaskSet that must be visualized
-     * @param taskSet The TaskSet to visualize. May be null to indicate that the TaskSet currently
-     *                on the server can be reused.
-     */
-    public void setTaskSet(TaskSet taskSet) {
-        this.taskSet = taskSet;
     }
 
     /**

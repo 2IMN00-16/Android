@@ -6,8 +6,6 @@ import org.json.JSONObject;
 import java.util.Iterator;
 import java.util.Map;
 
-import nl.tue.san.tasks.TaskSetIO;
-
 /**
  * Created by Maurice on 13-1-2017.
  */
@@ -21,7 +19,6 @@ public class VisualizationIO {
         // Extract simple properties
         visualization.setTimeScale(jsonObject.getLong(TIME_SCALE));
         visualization.setCycleRate(jsonObject.getLong(CYCLE_RATE));
-        visualization.setTaskSet(TaskSetIO.fromJSON(jsonObject.getJSONObject(TASK_SET)));
 
         // Extract lights
         JSONObject lights = jsonObject.getJSONObject(LIGHTS);
@@ -42,9 +39,6 @@ public class VisualizationIO {
         // Insert simple properties
         object.put(CYCLE_RATE, visualization.getCycleRate());
         object.put(TIME_SCALE, visualization.getTimeScale());
-        if(visualization.getTaskSet() != null)
-            object.put(TASK_SET, TaskSetIO.toJSON(visualization.getTaskSet()));
-
 
         // Insert lights
         JSONObject lights = new JSONObject();
