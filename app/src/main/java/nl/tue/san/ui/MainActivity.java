@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import nl.tue.san.sanseminar.R;
 import nl.tue.san.tasks.TaskSetManager;
+import nl.tue.san.visualization.VisualizationManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -29,7 +30,8 @@ public class MainActivity extends AppCompatActivity
      */
     private DisplayState displayState;
 
-    private TaskSetManager manager;
+    private TaskSetManager taskSetManager;
+    private VisualizationManager visualizationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,8 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        this.manager = TaskSetManager.getInstance(this);
+        this.taskSetManager = TaskSetManager.getInstance(this);
+        this.visualizationManager = VisualizationManager.getInstance(this);
 
         this.navigationView = (NavigationView) findViewById(R.id.nav_view);
         this.navigationView.setNavigationItemSelectedListener(this);
