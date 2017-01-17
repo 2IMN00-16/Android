@@ -162,7 +162,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
      * Send out a request to the server to identify all lights.
      */
     private void requestIdentifyLights() {
-
+        this.manager.requestIdentification(this, 3000);
     }
 
     /**
@@ -173,7 +173,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
      * @param time The amount of time for which to display the color on each light before hidin it
      *             again.
      */
-    protected void identify(final Map<String, Integer> lightsToColor, long time){
+    public void identify(final Map<String, Integer> lightsToColor, long time){
 
         // cancel the current "hide" timer
         synchronized (this) {

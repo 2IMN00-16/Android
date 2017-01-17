@@ -8,10 +8,14 @@ import org.json.JSONTokener;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import nl.tue.san.net.Callback;
+import nl.tue.san.net.Server;
 import nl.tue.san.util.Manager;
 import nl.tue.san.util.ReadWriteSafeObject.Operation;
 
@@ -240,8 +244,10 @@ public class VisualizationManager extends Manager<Visualization> {
 
         this.endOfRecentIdentification = System.currentTimeMillis() + duration;
         this.mappingOfRecentIdentification = lightToColors;
-    }
 
+        for(OnVisualizationPropertiesChangeListener listener : listeners)
+            listener.onIdentificationStarted(mappingOfRecentIdentification, endOfRecentIdentification);
+    }
 
     /**
      * Add the given listener as a listener for visualization property changes.
@@ -268,6 +274,41 @@ public class VisualizationManager extends Manager<Visualization> {
 
         void onAvailableVisualizationsChange();
 
-        void onIdentificationStarted();
+        void onIdentificationStarted(Map<String, Integer> mappingOfRecentIdentification, long endOfRecentIdentification);
+    }
+
+    /**
+     * Request that the lights are identifiable for the given duration
+     * @param duration The duration in milliseconds for which the lights should be identifiable.
+     */
+    public void requestIdentification(final long duration) {
+        Server.POST("identify", new Callback() {
+            @Override
+            public void onSuccess(String data) {
+
+                try {
+                    HashMap<String, Integer> mapping = new HashMap<>();
+
+                    JSONObject jsonObject = new JSONObject(data);
+                    Iterator<String> keys = jsonObject.keys();
+                    while(keys.hasNext()){
+                        String light = keys.next();
+                        int color = 0xFF000000 + Integer.parseInt(jsonObject.getString(light).substring(1, 7), 16);
+                        mapping.put(light, color);
+                    }
+
+                    startIdentification(mapping, duration);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        },""+duration);
     }
 }
