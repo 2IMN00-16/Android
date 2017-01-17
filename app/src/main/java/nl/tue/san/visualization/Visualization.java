@@ -42,10 +42,6 @@ public class Visualization {
     public void set(String light, String visualization){
         if(light == null)
             throw new IllegalArgumentException("Light can't be null");
-        if(!VisualizationManager.getInstance().hasLight(light))
-            throw new IllegalArgumentException("Light \""+light+"\" is not available on the server");
-        if(visualization != null && !VisualizationManager.getInstance().hasVisualization(visualization))
-            throw new IllegalArgumentException("Visualization \""+visualization+"\" is not available on the server");
 
         this.lightVisualization.put(light, visualization);
     }
