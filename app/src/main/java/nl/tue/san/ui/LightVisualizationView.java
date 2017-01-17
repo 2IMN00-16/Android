@@ -70,11 +70,11 @@ public class LightVisualizationView extends LinearLayout {
     }
 
     /**
-     * Shows an identifying color for this light.
+     * Shows an identifying color for this light. The color is modified to be completely opaque.
      * @param color The color to display.
      */
     public void showIdentifyingColor(int color){
-        this.color.getDrawable().mutate().setColorFilter(color, PorterDuff.Mode.ADD);
+        this.color.getDrawable().mutate().setColorFilter(0xFF000000 | color, PorterDuff.Mode.ADD);
         this.color.setVisibility(VISIBLE);
     }
 

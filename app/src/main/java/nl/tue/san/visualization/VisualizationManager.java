@@ -294,7 +294,7 @@ public class VisualizationManager extends Manager<Visualization> {
                     Iterator<String> keys = jsonObject.keys();
                     while(keys.hasNext()){
                         String light = keys.next();
-                        int color = Integer.parseInt(jsonObject.getString(light).substring(1), 16);
+                        int color = 0xFF000000 + Integer.parseInt(jsonObject.getString(light).substring(1, 7), 16);
                         mapping.put(light, color);
                     }
 
