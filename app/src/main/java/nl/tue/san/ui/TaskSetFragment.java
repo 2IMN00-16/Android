@@ -58,6 +58,7 @@ public class TaskSetFragment extends Fragment implements Navigatable {
         // remove the listener to prevent it from staying alive.
         this.taskSetManager.removeOnTaskSetsChangedListener(this.adapter);
         this.adapter = null;
+        this.viewPager = null;
     }
     /**
      * Gets the properties for navigation purposes.
