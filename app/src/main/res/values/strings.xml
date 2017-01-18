@@ -20,4 +20,5 @@
     <string name="home_select_light_state">Lights</string>
     <string name="menu_task_set_delete">Delete this task set</string>
     <string name="menu_task_set_create">Create new task set</string>
+    <string name="menu_task_set_download">Download from server</string>
 </resources>

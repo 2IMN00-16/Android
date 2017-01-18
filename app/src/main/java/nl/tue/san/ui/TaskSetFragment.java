@@ -132,8 +132,9 @@ public class TaskSetFragment extends Fragment implements Navigatable {
             case R.id.menu_task_set_create:
                 requestCreateNewTaskSet(); return true;
             case R.id.menu_task_set_delete:
-                deleteCurrentTaskset();
-                return true;
+                deleteCurrentTaskset(); return true;
+            case R.id.menu_task_set_download:
+                this.taskSetManager.loadFromServer(); return true;
         }
         return false;
 
