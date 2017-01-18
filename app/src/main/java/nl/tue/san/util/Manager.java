@@ -198,6 +198,22 @@ public abstract class Manager<T>  {
         }
     }
 
+    /**
+     * Write the managed object asynchronously. This provides synchronization.
+     */
+    public void asyncWrite() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    write();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
 
     protected <ReturnType> ReturnType readOp(ReadWriteSafeObject.Operation<ReturnType> operation){
         return this.rwSemaphore.readOp(operation);
