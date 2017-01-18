@@ -38,9 +38,30 @@ public class TaskSetIO {
      * @see TaskIO#fromJSON(JSONObject)
      */
     public static TaskSet fromJSON(JSONObject object) throws JSONException {
+        return fromJSON(object.getString(NAME), object);
+    }
 
-        String name = object.getString(NAME);
-
+    /**
+     * Converts a JSONObject to a TaskSet, but uses the given name rather than the contained name.
+     * This expects that the following properties are set.
+     * <ul>
+     *      <li>
+     *          <em>(String)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Tasks</strong>
+     *          <em>(Array. The items in the array are expected to match the requirements set by
+     *          {@link TaskIO#fromJSON(JSONObject)} )</em>
+     *      </li>
+     * </ul>
+     *
+     * If any of the required properties is missing, a JSONException is thrown.
+     *
+     * @param object The JSONObject representing a TaskSet.
+     * @return The created TaskSet
+     * @see TaskIO#fromJSON(JSONObject)
+     */
+    public static TaskSet fromJSON(String name, JSONObject object) throws JSONException {
         List<Task> tasks = new LinkedList<>();
 
         JSONArray taskArray = object.getJSONArray(TASKS);
