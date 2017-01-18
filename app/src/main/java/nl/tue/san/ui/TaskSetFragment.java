@@ -1,15 +1,18 @@
 package nl.tue.san.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -100,13 +103,30 @@ public class TaskSetFragment extends Fragment implements Navigatable {
      * Prompt the user to create a new task set
      */
     private void requestCreateNewTaskSet(){
-        createNewTaskSet(""+System.currentTimeMillis());
+
+
+        final EditText input = new EditText(this.getContext());
+        final AlertDialog dialog =
+                new AlertDialog.Builder(this.getContext())
+                        .setTitle("Create new TaskSet")
+                        .setView(input)
+                        .setCancelable(true)
+                        .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                TaskSetFragment.this.createNewTaskSet(input.getText().toString());
+                            }
+                        })
+                .create();
+
+        dialog.show();
     }
 
     /**
      * Remove the current taskSet.
      */
     private void deleteCurrentTaskset(){
+
         this.taskSetManager.remove(this.current());
     }
 
