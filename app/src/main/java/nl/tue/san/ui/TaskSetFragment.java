@@ -1,14 +1,18 @@
 package nl.tue.san.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -28,6 +32,7 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
     private TaskSetManager taskSetManager = TaskSetManager.getInstance(this.getContext());
     private ViewPager viewPager;
+    private TaskSetAdapter adapter;
 
     public TaskSetFragment() {
         // Required empty public constructor
@@ -44,11 +49,20 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
         this.viewPager = (ViewPager) inflater.inflate(R.layout.fragment_task_set, container, false);
 
-        viewPager.setAdapter(new TaskSetAdapter());
+        this.adapter = new TaskSetAdapter();
+        this.viewPager.setAdapter(this.adapter);
+        this.taskSetManager.addOnTaskSetsChangedListener(this.adapter);
 
         return viewPager;
     }
 
+    public void onDestroyView(){
+        super.onDestroyView();
+        // remove the listener to prevent it from staying alive.
+        this.taskSetManager.removeOnTaskSetsChangedListener(this.adapter);
+        this.adapter = null;
+        this.viewPager = null;
+    }
     /**
      * Gets the properties for navigation purposes.
      */
@@ -66,14 +80,61 @@ public class TaskSetFragment extends Fragment implements Navigatable {
                                                                         createNewTask();
                                                                     }
                                                                 })
+                                                                .useMenu(R.menu.menu_task_set)
                                                                 .build();
+
+    /**
+     * Get the current TaskSet.
+     * @return The TaskSet that is currently displaying.
+     */
+    private TaskSet current(){
+        return taskSetManager.get(this.viewPager.getCurrentItem());
+    }
+
+    /**
+     * Create a new TaskSet under the given name.
+     */
+    private void createNewTaskSet(String taskSetName){
+        TaskSet taskSet = new TaskSet(taskSetName);
+        this.taskSetManager.register(taskSet);
+    }
+
+    /**
+     * Prompt the user to create a new task set
+     */
+    private void requestCreateNewTaskSet(){
+
+
+        final EditText input = new EditText(this.getContext());
+        final AlertDialog dialog =
+                new AlertDialog.Builder(this.getContext())
+                        .setTitle("Create new TaskSet")
+                        .setView(input)
+                        .setCancelable(true)
+                        .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                TaskSetFragment.this.createNewTaskSet(input.getText().toString());
+                            }
+                        })
+                .create();
+
+        dialog.show();
+    }
+
+    /**
+     * Remove the current taskSet.
+     */
+    private void deleteCurrentTaskset(){
+
+        this.taskSetManager.remove(this.current());
+    }
 
     /**
      * Creates a new Task in the currently displaying TaskSet.
      */
     private void createNewTask() {
-        TaskSet currentlyDisplayed = taskSetManager.get(this.viewPager.getCurrentItem());
-        this.createOrModify(currentlyDisplayed, null);
+        this.createOrModify(current(), null);
     }
 
 
@@ -84,19 +145,37 @@ public class TaskSetFragment extends Fragment implements Navigatable {
         startActivity(intent);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+            case R.id.menu_task_set_create:
+                requestCreateNewTaskSet(); return true;
+            case R.id.menu_task_set_delete:
+                deleteCurrentTaskset(); return true;
+            case R.id.menu_task_set_download:
+                this.taskSetManager.loadFromServer(); return true;
+        }
+        return false;
+
+    }
+
     /**
      * PagerAdapter that creates a page for each TaskSet.
      */
-    private final class TaskSetAdapter extends PagerAdapter {
+    private final class TaskSetAdapter extends PagerAdapter implements TaskSetManager.OnTaskSetsChangedListener {
 
+        private int count = taskSetManager.size();
         @Override
         public int getCount() {
-            return taskSetManager.size();
+            synchronized (this){
+                return count;
+            }
         }
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return view instanceof ListView && ((TaskAdapter)((ListView)view).getAdapter()).taskSet.equals(object);
+            return object == view;
         }
 
         @Override
@@ -106,20 +185,41 @@ public class TaskSetFragment extends Fragment implements Navigatable {
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeAllViews();
+            container.removeView((View) object);
+            ((ListView)object).setAdapter(null);
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-
-            TaskSet displayed = taskSetManager.get(position);
-
             ListView listView = new ListView(getContext());
             listView.setAdapter(new TaskAdapter(taskSetManager.get(position)));
             container.addView(listView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
+            return listView;
+        }
 
-            return displayed;
+        @Override
+        public int getItemPosition(Object object) {
+            TaskSet displayed = ((TaskAdapter) ((ListView) object).getAdapter()).taskSet;
+
+            int index = taskSetManager.indexOf(displayed);
+            return index >= 0 ? index : POSITION_NONE;
+        }
+
+        @Override
+        public void onTaskSetAdded(TaskSet taskSet) {
+            synchronized (this) {
+                this.count = taskSetManager.size();
+                this.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onTaskSetRemoved(TaskSet taskSet) {
+            synchronized (this){
+                this.count = taskSetManager.size();
+                this.notifyDataSetChanged();
+            }
         }
     }
 
