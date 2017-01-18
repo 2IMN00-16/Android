@@ -1,9 +1,9 @@
 package nl.tue.san.tasks;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -252,29 +252,29 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
         });
     }
 
-    private void loadFromServer() {
-
-        final TaskSetManager that = this;
+    /**
+     * Load a TaskSet from the server. This provides no guarantee for success.
+     */
+    public void loadFromServer() {
 
         Server.GET("taskset", new Callback() {
             @Override
-            public void onSuccess(String data) {
-                Log.i("Network", "Retrieved data: " + data);
-                try {
-                    JSONObject obj = new JSONObject(new JSONTokener(data));
-
-                    // Then convert each entry in the JSONArray to a TaskSet.
-                    that.register(TaskSetIO.fromJSON(obj));
-
-                } catch (Exception e) {
-                    Log.e("TaskSetManager", "Loading of taskset Failed inner", e);
-                    this.onFailure();
-                }
+            public void onSuccess(final String data) {
+                    TaskSetManager.this.writeOp(new Operation<Void>() {
+                        @Override
+                        public Void perform() {
+                            try {
+                                TaskSetManager.this.register(TaskSetIO.fromJSON("SERVER",new JSONObject(new JSONTokener(data))));
+                            } catch (JSONException e) {
+                                onFailure();
+                            }
+                            return null;
+                        }
+                    });
             }
 
             @Override
             public void onFailure() {
-                Log.e("TaskSetManager", "Loading of taskset Failed through callback");
             }
         });
     }
