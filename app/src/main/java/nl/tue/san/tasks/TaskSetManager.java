@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -34,6 +35,24 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
      * Constant describing the extension of TaskSet files. The extension includes the dot.
      */
     private static final String TASK_SETS_FILENAME = "root.tasksets";
+
+    private final Set<OnTaskSetsChangedListener> listeners = new HashSet<>();
+
+    /**
+     * Add the given {@link OnTaskSetsChangedListener} as a listener on this manager.
+     * @param listener The Listener to add
+     */
+    public void addOnTaskSetsChangedListener (OnTaskSetsChangedListener listener){
+        this.listeners.add(listener);
+    }
+
+    /**
+     * Remove the given {@link OnTaskSetsChangedListener} as a listener on this manager.
+     * @param listener The Listener to remove
+     */
+    public void removeOnTaskSetsChangedListener (OnTaskSetsChangedListener listener){
+        this.listeners.remove(listener);
+    }
 
     /**
      * Obtain an instance of the TaskSetManager. On the first call to this method the manager is
@@ -172,10 +191,24 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
      * @param taskSet
      */
     public void register(final TaskSet taskSet) {
-        this.writeOp(new Operation<TaskSet>() {
+        this.writeOp(new Operation<Void>() {
             @Override
-            public TaskSet perform() {
-                return managed().put(taskSet.getName(), taskSet);
+            public Void perform() {
+                TaskSet contained = managed().get(taskSet.getName());
+
+                if(taskSet.equals(contained))
+                    return null;
+
+                if(contained != null)
+                    remove(managed().get(taskSet.getName()));
+
+
+                managed().put(taskSet.getName(), taskSet);
+                asyncWrite();
+                for(OnTaskSetsChangedListener listener : listeners)
+                    listener.onTaskSetAdded(taskSet);
+
+                return null;
             }
         });
     }
@@ -192,6 +225,9 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
             public Boolean perform() {
                 if (managed().containsKey(taskSet.getName()) && managed().get(taskSet.getName()).equals(taskSet)) {
                     managed().remove(taskSet.getName());
+                    asyncWrite();
+                    for(OnTaskSetsChangedListener listener : listeners)
+                        listener.onTaskSetRemoved(taskSet);
                     return true;
                 } else
                     return false;
@@ -206,35 +242,42 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
         this.writeOp(new Operation<Void>() {
             @Override
             public Void perform() {
+                LinkedList<TaskSet> values = new LinkedList<>(managed().values());
                 managed().clear();
+                asyncWrite();
+                for(TaskSet removed : values)
+                    for(OnTaskSetsChangedListener listener : listeners)
+                        listener.onTaskSetRemoved(removed);
                 return null;
             }
         });
     }
 
-    private void loadFromServer() {
-
-        final TaskSetManager that = this;
+    /**
+     * Load a TaskSet from the server. This provides no guarantee for success.
+     */
+    public void loadFromServer() {
 
         Server.GET("taskset", new Callback() {
             @Override
-            public void onSuccess(String data) {
-                Log.i("Network", "Retrieved data: " + data);
-                try {
-                    JSONObject obj = new JSONObject(new JSONTokener(data));
-
-                    // Then convert each entry in the JSONArray to a TaskSet.
-                    that.register(TaskSetIO.fromJSON(obj));
-
-                } catch (Exception e) {
-                    Log.e("TaskSetManager", "Loading of taskset Failed inner", e);
-                    this.onFailure();
-                }
+            public void onSuccess(final String data) {
+                    TaskSetManager.this.writeOp(new Operation<Void>() {
+                        @Override
+                        public Void perform() {
+                            try {
+                                TaskSetManager.this.register(TaskSetIO.fromJSON("SERVER",new JSONObject(new JSONTokener(data))));
+                            } catch (JSONException e) {
+                                Log.e("TaskSetManager","Couldn't load task set: ", e);
+                                onFailure();
+                            }
+                            return null;
+                        }
+                    });
             }
 
             @Override
             public void onFailure() {
-                Log.e("TaskSetManager", "Loading of taskset Failed through callback");
+                Log.e("TaskSetManager","Couldn't load task set");
             }
         });
     }
@@ -247,5 +290,11 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
      */
     public int indexOf(TaskSet taskSet) {
         return new LinkedList<>(this.managed().values()).indexOf(taskSet);
+    }
+
+    public interface OnTaskSetsChangedListener {
+        void onTaskSetAdded(TaskSet taskSet);
+
+        void onTaskSetRemoved(TaskSet taskSet);
     }
 }
