@@ -53,14 +53,12 @@ public class TaskSetFragment extends Fragment implements Navigatable {
         return viewPager;
     }
 
-    @Override
-    public void onPause(){
-        super.onPause();
+    public void onDestroyView(){
+        super.onDestroyView();
         // remove the listener to prevent it from staying alive.
         this.taskSetManager.removeOnTaskSetsChangedListener(this.adapter);
         this.adapter = null;
     }
-
     /**
      * Gets the properties for navigation purposes.
      */
