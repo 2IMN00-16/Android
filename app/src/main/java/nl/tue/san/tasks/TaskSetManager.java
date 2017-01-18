@@ -203,6 +203,7 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
 
 
                 managed().put(taskSet.getName(), taskSet);
+                asyncWrite();
                 for(OnTaskSetsChangedListener listener : listeners)
                     listener.onTaskSetAdded(taskSet);
 
@@ -223,6 +224,7 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
             public Boolean perform() {
                 if (managed().containsKey(taskSet.getName()) && managed().get(taskSet.getName()).equals(taskSet)) {
                     managed().remove(taskSet.getName());
+                    asyncWrite();
                     for(OnTaskSetsChangedListener listener : listeners)
                         listener.onTaskSetRemoved(taskSet);
                     return true;
@@ -241,6 +243,7 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
             public Void perform() {
                 LinkedList<TaskSet> values = new LinkedList<>(managed().values());
                 managed().clear();
+                asyncWrite();
                 for(TaskSet removed : values)
                     for(OnTaskSetsChangedListener listener : listeners)
                         listener.onTaskSetRemoved(removed);
