@@ -1,6 +1,7 @@
 package nl.tue.san.tasks;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -266,6 +267,7 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
                             try {
                                 TaskSetManager.this.register(TaskSetIO.fromJSON("SERVER",new JSONObject(new JSONTokener(data))));
                             } catch (JSONException e) {
+                                Log.e("TaskSetManager","Couldn't load task set: ", e);
                                 onFailure();
                             }
                             return null;
@@ -275,6 +277,7 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
 
             @Override
             public void onFailure() {
+                Log.e("TaskSetManager","Couldn't load task set");
             }
         });
     }
