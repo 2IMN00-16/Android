@@ -26,6 +26,11 @@ public class Visualization {
      */
     private long cycleRate;
 
+    /**
+     * The Scheduler to use
+     */
+    private String scheduler;
+
     public Visualization(){
         this.timeScale = DEFAULT_TIME_SCALE;
         this.cycleRate = DEFAULT_CYCLE_RATE;
@@ -131,5 +136,13 @@ public class Visualization {
      */
     public String getMapping(String light) {
         return this.lightVisualization.get(light);
+    }
+
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
     }
 }

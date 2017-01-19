@@ -40,6 +40,7 @@ public class VisualizationIO {
         // Insert simple properties
         object.put(CYCLE_RATE, visualization.getCycleRate());
         object.put(TIME_SCALE, visualization.getTimeScale());
+        object.put(SCHEDULER, visualization.getScheduler());
 
         // Insert lights
         JSONArray lights = new JSONArray();
@@ -54,6 +55,7 @@ public class VisualizationIO {
 
     private static final String VALUE = "Value";
     private static final String NAME = "Name";
+    private static final String SCHEDULER = "Scheduler";
     private static final String LIGHTS = "Lights";
     private static final String CYCLE_RATE = "CycleRate";
     private static final String TIME_SCALE = "TimeScale";
