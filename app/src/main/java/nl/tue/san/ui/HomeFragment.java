@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -54,6 +55,19 @@ public class HomeFragment extends Fragment implements Navigatable {
         this.scheduler = (Spinner)inflated.findViewById(R.id.scheduler_spinner);
         this.taskSet = (Spinner)inflated.findViewById(R.id.task_set_spinner);
 
+        // Listen to changes to the selected scheduler, and report them to the visualization.
+        this.scheduler.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                manager.getVisualization().setScheduler((String) parent.getAdapter().getItem(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         display();
 
         return inflated;
@@ -94,6 +108,7 @@ public class HomeFragment extends Fragment implements Navigatable {
 
             // Then apply
             this.scheduler.setAdapter(spinnerArrayAdapter);
+            this.scheduler.setSelection(schedulers.indexOf(manager.getVisualization().getScheduler()));
         }
     }
 
