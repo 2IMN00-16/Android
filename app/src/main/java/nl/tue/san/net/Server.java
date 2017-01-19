@@ -7,7 +7,7 @@ import android.util.Log;
 import okhttp3.*;
 
 enum RequestTypes {
-    GET, POST, DELETE, PATCH;
+    GET, POST, DELETE, PATCH, PUT;
 }
 
 public class Server {
@@ -22,7 +22,34 @@ public class Server {
 
     public static void POST(String uri, Callback cb, String data) {
         new RequestRunner().execute(nl.tue.san.net.IRequest.getInstance(
-                RequestTypes.GET,
+                RequestTypes.POST,
+                uri,
+                data,
+                cb
+        ));
+    }
+
+    public static void DELETE(String uri, Callback cb, String data) {
+        new RequestRunner().execute(nl.tue.san.net.IRequest.getInstance(
+                RequestTypes.DELETE,
+                uri,
+                data,
+                cb
+        ));
+    }
+
+    public static void PATCH(String uri, Callback cb, String data) {
+        new RequestRunner().execute(nl.tue.san.net.IRequest.getInstance(
+                RequestTypes.PATCH,
+                uri,
+                data,
+                cb
+        ));
+    }
+
+    public static void PUT(String uri, Callback cb, String data) {
+        new RequestRunner().execute(nl.tue.san.net.IRequest.getInstance(
+                RequestTypes.PUT,
                 uri,
                 data,
                 cb
