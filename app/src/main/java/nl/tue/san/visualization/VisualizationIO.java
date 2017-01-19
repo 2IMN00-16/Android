@@ -20,6 +20,7 @@ public class VisualizationIO {
         // Extract simple properties
         visualization.setTimeScale(jsonObject.getLong(TIME_SCALE));
         visualization.setCycleRate(jsonObject.getLong(CYCLE_RATE));
+        visualization.setScheduler(jsonObject.getString(SCHEDULER));
 
         // Extract lights
         JSONArray lights = jsonObject.getJSONArray(LIGHTS);
