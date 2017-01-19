@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -32,6 +33,8 @@ import nl.tue.san.visualization.VisualizationManager;
  */
 public class HomeFragment extends Fragment implements Navigatable {
 
+
+    private ProgressBar progressBar;
 
     private VisualizationManager manager;
     private TaskSetManager taskSetManager;
@@ -59,6 +62,8 @@ public class HomeFragment extends Fragment implements Navigatable {
 
         this.scheduler = (Spinner)inflated.findViewById(R.id.scheduler_spinner);
         this.taskSet = (Spinner)inflated.findViewById(R.id.task_set_spinner);
+
+        this.progressBar = (ProgressBar)inflated.findViewById(R.id.progress);
 
         // Listen to changes to the selected scheduler, and report them to the visualization.
         this.scheduler.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -147,6 +152,33 @@ public class HomeFragment extends Fragment implements Navigatable {
         }
     }
 
+    /**
+     * Show the given amount of process
+     * @param step The progress
+     * @param total The maximally achievable progress.
+     */
+    private void showProgress(final int step, final int total){
+        this.progressBar.post(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setMax(total);
+                progressBar.setProgress(step);
+            }
+        });
+    }
+
+    /**
+     * Show that progress is complete. This hides the progressbar.
+     */
+    private void progressCompleted(){
+        this.progressBar.post(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
 
     /**
      * Call to start the visualization
