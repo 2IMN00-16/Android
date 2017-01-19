@@ -8,12 +8,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import java.util.Arrays;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import nl.tue.san.net.Callback;
+import nl.tue.san.net.Server;
 import nl.tue.san.sanseminar.R;
 import nl.tue.san.tasks.TaskSetManager;
 import nl.tue.san.visualization.Visualization;
@@ -98,17 +103,47 @@ public class HomeFragment extends Fragment implements Navigatable {
          * Update the Scheduler
          */
         {
-            // Get all schedulers and sort.
-            List<String> schedulers = Arrays.asList("FPPS","FPTS","FPNS");
-            Collections.sort(schedulers);
-
+            final List<String> schedulers = new LinkedList<>();
             // Then create basic adapter
-            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, schedulers);
+            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, schedulers);
             spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
             // Then apply
             this.scheduler.setAdapter(spinnerArrayAdapter);
-            this.scheduler.setSelection(schedulers.indexOf(manager.getVisualization().getScheduler()));
+
+            // Now try to get new data, and update the view.
+            Server.GET("schedulers", new Callback() {
+                @Override
+                public void onSuccess(String data) {
+
+                    try {
+                        JSONArray array = new JSONArray(data);
+                        for(int i = 0; i < array.length(); ++i)
+                            schedulers.add(array.getString(i));
+                        Collections.sort(schedulers);
+                        spinnerArrayAdapter.notifyDataSetChanged();
+
+                        if(schedulers.contains(manager.getVisualization().getScheduler()))
+                            manager.getVisualization().setScheduler(schedulers.get(0));
+
+                        scheduler.setSelection(schedulers.indexOf(manager.getVisualization().getScheduler()));
+                        scheduler.setEnabled(true);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        onFailure();
+                    }
+
+
+                }
+
+                @Override
+                public void onFailure() {
+                    schedulers.clear();
+                    scheduler.setEnabled(false);
+                    Toast.makeText(getContext(), "Failed to load schedulers from server", Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 
