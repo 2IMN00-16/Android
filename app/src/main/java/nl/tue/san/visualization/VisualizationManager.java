@@ -164,7 +164,7 @@ public class VisualizationManager extends Manager<Visualization> {
      * visualizations are available on the server.
      */
     public void synchronizeVisualizations(){
-        Server.GET("visualizations", new Callback() {
+        Server.GET("visualization", new Callback() {
             @Override
             public void onSuccess(final String data) {
                 VisualizationManager.this.writeOp(new Operation<Void>() {
