@@ -22,11 +22,10 @@ public class VisualizationIO {
         visualization.setCycleRate(jsonObject.getLong(CYCLE_RATE));
 
         // Extract lights
-        JSONObject lights = jsonObject.getJSONObject(LIGHTS);
-        Iterator<String> lightsIter = lights.keys();
-        while(lightsIter.hasNext()) {
-            String light = lightsIter.next();
-            visualization.set(light, lights.getString(light));
+        JSONArray lights = jsonObject.getJSONArray(LIGHTS);
+
+        for(int i = 0 ; i < lights.length(); ++i) {
+            visualization.set(lights.getJSONObject(i).getString(NAME), lights.getJSONObject(i).getString(VALUE));
         }
 
         //Done
