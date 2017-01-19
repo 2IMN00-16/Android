@@ -30,7 +30,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
 
     private VisualizationManager manager;
 
-    private EditText timeScale, cycleRate;
+    private EditText timeScale, cycleRate, animationDuration;
     private LinearLayout lightsContainer;
 
     private List<LightVisualizationView> lightVisualizationViews = new LinkedList<>();
@@ -62,6 +62,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
         this.lightsContainer = (LinearLayout)inflated.findViewById(R.id.lights_container);
         this.timeScale = (EditText)inflated.findViewById(R.id.time_scale);
         this.cycleRate = (EditText)inflated.findViewById(R.id.cycle_rate);
+        this.animationDuration = (EditText)inflated.findViewById(R.id.animation_duration);
 
         display();
 
@@ -107,6 +108,12 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
         this.timeScale.setText(String.format(Locale.getDefault(), "%d",visualization.getTimeScale()));
         this.timeScale.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_TIME_SCALE));
 
+         /*
+         * Update the time scale
+         */
+        this.animationDuration.setText(String.format(Locale.getDefault(), "%d",visualization.getAnimationDuration()));
+        this.animationDuration.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_ANIMATION_DURATION));
+
     }
 
     private long getCycleRateInput(){
@@ -127,6 +134,15 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
         else
             return Visualization.DEFAULT_TIME_SCALE;
     }
+
+
+    private long getAnimationDurationInput(){
+        if(animationDuration.getText().length() > 0)
+            return Long.parseLong(animationDuration.getText().toString());
+        else
+            return Visualization.DEFAULT_ANIMATION_DURATION;
+    }
+
 
     @Override
     public void onPause() {
@@ -149,6 +165,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
 
         visualization.setCycleRate(getCycleRateInput());
         visualization.setTimeScale(getTimeScaleInput());
+        visualization.setAnimationDuration(getAnimationDurationInput());
 
         for(LightVisualizationView view : lightVisualizationViews)
             visualization.set(view.getLight(), view.getSelectedVisualization());
