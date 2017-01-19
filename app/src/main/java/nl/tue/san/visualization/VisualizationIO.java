@@ -1,5 +1,6 @@
 package nl.tue.san.visualization;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,10 +42,9 @@ public class VisualizationIO {
         object.put(TIME_SCALE, visualization.getTimeScale());
 
         // Insert lights
-        JSONObject lights = new JSONObject();
+        JSONArray lights = new JSONArray();
         for(Map.Entry<String, String> entry : visualization.getMapping().entrySet())
-            if(entry.getValue() != null)
-                lights.put(entry.getKey(), entry.getValue());
+            lights.put(new JSONObject().put(NAME, entry.getValue()).put(VALUE, entry.getValue()));
         object.put(LIGHTS, lights);
 
         // Done
@@ -52,7 +52,8 @@ public class VisualizationIO {
     }
 
 
-    private static final String TASK_SET = "TaskSet";
+    private static final String VALUE = "Value";
+    private static final String NAME = "Name";
     private static final String LIGHTS = "Lights";
     private static final String CYCLE_RATE = "CycleRate";
     private static final String TIME_SCALE = "TimeScale";
