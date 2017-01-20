@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import nl.tue.san.sanseminar.R;
 import nl.tue.san.tasks.Task;
@@ -28,12 +29,17 @@ import nl.tue.san.tasks.TaskSetManager;
  * Use the {@link TaskSetFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TaskSetFragment extends ProgressableFragment implements Navigatable {
+public class TaskSetFragment extends ProgressableFragment implements Navigatable, TaskSetManager.OnTaskSetsChangedListener {
 
 
     private TaskSetManager taskSetManager = TaskSetManager.getInstance(this.getContext());
     private ViewPager viewPager;
     private TaskSetAdapter adapter;
+
+    /**
+     * View containing message that there are no task sets available
+     */
+    private View noTasksetsMessage;
 
     public TaskSetFragment() {
         // Required empty public constructor
@@ -51,12 +57,15 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
         View inflated = inflater.inflate(R.layout.fragment_task_set, container, false);
 
         this.viewPager = (ViewPager) inflated.findViewById(R.id.pager);
+        this.noTasksetsMessage = inflated.findViewById(R.id.message_no_task_sets);
 
         this.adapter = new TaskSetAdapter();
         this.viewPager.setAdapter(this.adapter);
-        this.taskSetManager.addOnTaskSetsChangedListener(this.adapter);
+        this.taskSetManager.addOnTaskSetsChangedListener(this);
 
         this.setProgressBar((ProgressBar) inflated.findViewById(R.id.progress));
+
+        this.display();
 
         return inflated;
     }
@@ -64,9 +73,10 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
     public void onDestroyView(){
         super.onDestroyView();
         // remove the listener to prevent it from staying alive.
-        this.taskSetManager.removeOnTaskSetsChangedListener(this.adapter);
+        this.taskSetManager.removeOnTaskSetsChangedListener(this);
         this.adapter = null;
         this.viewPager = null;
+        this.noTasksetsMessage = null;
     }
     /**
      * Gets the properties for navigation purposes.
@@ -131,16 +141,25 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
      * Remove the current taskSet.
      */
     private void deleteCurrentTaskset(){
-        this.showIndeterminate();
-        this.taskSetManager.remove(this.current());
-        this.progressCompleted();
+        if(taskSetManager.size() > 0) {
+            this.showIndeterminate();
+            this.taskSetManager.remove(this.current());
+            this.progressCompleted();
+        }
+        else
+            Toast.makeText(this.getContext(),"No TaskSet to delete", Toast.LENGTH_LONG).show();
     }
 
     /**
      * Creates a new Task in the currently displaying TaskSet.
      */
     private void createNewTask() {
-        this.createOrModify(current(), null);
+        if(taskSetManager.size() > 0) {
+            this.createOrModify(current(), null);
+        }
+        else
+            Toast.makeText(this.getContext(),"No TaskSet to create a task for", Toast.LENGTH_LONG).show();
+
     }
 
 
@@ -172,10 +191,31 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
         this.progressCompleted();
     }
 
+    private void display(){
+        if(this.viewPager != null)
+            this.viewPager.setVisibility(taskSetManager.size() > 0 ? View.VISIBLE : View.GONE);
+        if(this.noTasksetsMessage != null)
+            this.noTasksetsMessage.setVisibility(taskSetManager.size() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onTaskSetAdded(TaskSet taskSet) {
+        if(this.adapter != null)
+            this.adapter.recount();
+        display();
+    }
+
+    @Override
+    public void onTaskSetRemoved(TaskSet taskSet) {
+        if(this.adapter != null)
+            this.adapter.recount();
+        display();
+    }
+
     /**
      * PagerAdapter that creates a page for each TaskSet.
      */
-    private final class TaskSetAdapter extends PagerAdapter implements TaskSetManager.OnTaskSetsChangedListener {
+    private final class TaskSetAdapter extends PagerAdapter {
 
         private int count = taskSetManager.size();
         @Override
@@ -218,17 +258,8 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
             return index >= 0 ? index : POSITION_NONE;
         }
 
-        @Override
-        public void onTaskSetAdded(TaskSet taskSet) {
+        private void recount(){
             synchronized (this) {
-                this.count = taskSetManager.size();
-                this.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onTaskSetRemoved(TaskSet taskSet) {
-            synchronized (this){
                 this.count = taskSetManager.size();
                 this.notifyDataSetChanged();
             }

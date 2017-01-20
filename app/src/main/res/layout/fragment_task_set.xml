@@ -19,8 +19,25 @@
     </LinearLayout>
 
 
+    <RelativeLayout
+        android:visibility="visible"
+        android:id="@+id/message_no_task_sets"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="No task sets available"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent" tools:context="nl.tue.san.ui.TaskSetFragment">
 
