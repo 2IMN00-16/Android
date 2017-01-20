@@ -307,7 +307,7 @@ public class VisualizationManager extends Manager<Visualization> {
      * @param duration The duration in milliseconds for which the lights should be identifiable.
      */
     public void requestIdentification(final long duration) {
-        Server.POST("identify", new Callback() {
+        Server.POST("lamps/identify/"+duration, new Callback() {
             @Override
             public void onSuccess(String data) {
 
@@ -334,6 +334,6 @@ public class VisualizationManager extends Manager<Visualization> {
             public void onFailure() {
 
             }
-        },""+duration);
+        },"");
     }
 }
