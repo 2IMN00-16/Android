@@ -154,7 +154,12 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
      * Creates a new Task in the currently displaying TaskSet.
      */
     private void createNewTask() {
-        this.createOrModify(current(), null);
+        if(taskSetManager.size() > 0) {
+            this.createOrModify(current(), null);
+        }
+        else
+            Toast.makeText(this.getContext(),"No TaskSet to create a task for", Toast.LENGTH_LONG).show();
+
     }
 
 
