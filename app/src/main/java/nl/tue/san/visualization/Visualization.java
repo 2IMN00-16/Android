@@ -26,6 +26,12 @@ public class Visualization {
      */
     private long cycleRate;
 
+    /**
+     * The Scheduler to use
+     */
+    private String scheduler;
+    private long animationDuration;
+
     public Visualization(){
         this.timeScale = DEFAULT_TIME_SCALE;
         this.cycleRate = DEFAULT_CYCLE_RATE;
@@ -124,6 +130,11 @@ public class Visualization {
 
 
     /**
+     * The default animation duration in milliseconds
+     */
+    public static final long DEFAULT_ANIMATION_DURATION = 30;
+
+    /**
      * Get the mapping for the specified light
      * @param light The light for which to get the mapping
      * @return The visualization that should be used for the given light. May return null, which
@@ -131,5 +142,21 @@ public class Visualization {
      */
     public String getMapping(String light) {
         return this.lightVisualization.get(light);
+    }
+
+    public String getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(String scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    public long getAnimationDuration() {
+        return animationDuration;
+    }
+
+    public void setAnimationDuration(long animationDuration) {
+        this.animationDuration = animationDuration;
     }
 }

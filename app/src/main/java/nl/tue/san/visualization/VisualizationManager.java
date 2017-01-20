@@ -2,16 +2,20 @@ package nl.tue.san.visualization;
 
 import android.content.Context;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import nl.tue.san.net.Callback;
+import nl.tue.san.net.Server;
 import nl.tue.san.util.Manager;
 import nl.tue.san.util.ReadWriteSafeObject.Operation;
 
@@ -30,14 +34,19 @@ public class VisualizationManager extends Manager<Visualization> {
     private static VisualizationManager instance;
 
     /**
+     * All OnVisualizationPropertiesChangeListeners registered on this manager.
+     */
+    private final Set<OnVisualizationPropertiesChangeListener> listeners = new HashSet<>();
+
+    /**
      * Set containing all available lights.
      */
-    private Set<String> lights;
+    private final Set<String> lights = new HashSet<>();
 
     /**
      * Set containing all possible visualizations that can be applied to a light.
      */
-    private Set<String> visualizations;
+    private final Set<String> visualizations = new HashSet<>();
 
     /**
      * Indicates the end of the most recent request to identify the lights. This indicates the time
@@ -104,6 +113,7 @@ public class VisualizationManager extends Manager<Visualization> {
      */
     private VisualizationManager(Context context) {
         super(new File(context.getFilesDir(), VISUALIZATION_FILENAME));
+        this.synchronize();
     }
 
     /**
@@ -122,15 +132,30 @@ public class VisualizationManager extends Manager<Visualization> {
      */
     public void synchronizeLights(){
 
-        final Collection<String> lights = new HashSet<>();
-
-        // Do the following writeOp call async
-        this.writeOp(new Operation<Void>() {
+        Server.GET("lamps", new Callback() {
             @Override
-            public Void perform() {
-                VisualizationManager.instance.lights.clear();
-                VisualizationManager.instance.lights.addAll(lights);
-                return null;
+            public void onSuccess(final String data) {
+                VisualizationManager.this.writeOp(new Operation<Void>() {
+                    @Override
+                    public Void perform() {
+                        try {
+                            final JSONArray lamps = new JSONArray(data);
+                            VisualizationManager.instance.lights.clear();
+                            for(int i = 0 ; i <lamps.length(); ++i)
+                                VisualizationManager.instance.lights.add(lamps.getString(i));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+
+                    }
+                });
+                for(OnVisualizationPropertiesChangeListener listener : VisualizationManager.this.listeners)
+                    listener.onAvailableLightsChange();
+            }
+
+            @Override
+            public void onFailure() {
             }
         });
     }
@@ -139,15 +164,29 @@ public class VisualizationManager extends Manager<Visualization> {
      * visualizations are available on the server.
      */
     public void synchronizeVisualizations(){
-        final Collection<String> visualizations = new HashSet<>();
-
-        // Do the following writeOp call async
-        this.writeOp(new Operation<Void>() {
+        Server.GET("settings/visualizers", new Callback() {
             @Override
-            public Void perform() {
-                VisualizationManager.instance.visualizations.clear();
-                VisualizationManager.instance.visualizations.addAll(visualizations);
-                return null;
+            public void onSuccess(final String data) {
+                VisualizationManager.this.writeOp(new Operation<Void>() {
+                    @Override
+                    public Void perform() {
+                        try {
+                            final JSONArray lamps = new JSONArray(data);
+                            VisualizationManager.instance.visualizations.clear();
+                            for(int i = 0 ; i <lamps.length(); ++i)
+                                VisualizationManager.instance.visualizations.add(lamps.getString(i));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                });
+                for(OnVisualizationPropertiesChangeListener listener : VisualizationManager.this.listeners)
+                    listener.onAvailableVisualizationsChange();
+            }
+
+            @Override
+            public void onFailure() {
             }
         });
     }
@@ -213,14 +252,6 @@ public class VisualizationManager extends Manager<Visualization> {
         return new Visualization();
     }
 
-    public long getEndOfRecentIdentification() {
-        return endOfRecentIdentification;
-    }
-
-    public Map<String, Integer> getMappingOfRecentIdentification() {
-        return mappingOfRecentIdentification;
-    }
-
     /**
      * Start a new identification.
      * @param lightToColors THe mapping to use to identify lights
@@ -235,5 +266,74 @@ public class VisualizationManager extends Manager<Visualization> {
 
         this.endOfRecentIdentification = System.currentTimeMillis() + duration;
         this.mappingOfRecentIdentification = lightToColors;
+
+        for(OnVisualizationPropertiesChangeListener listener : listeners)
+            listener.onIdentificationStarted(lightToColors, duration);
+    }
+
+    /**
+     * Add the given listener as a listener for visualization property changes.
+     * @param listener The listener to register.
+     */
+    public void addListener(OnVisualizationPropertiesChangeListener listener) {
+        this.listeners.add(listener);
+        final long identificationTime = this.endOfRecentIdentification - System.currentTimeMillis();
+        if(identificationTime > 0)
+            listener.onIdentificationStarted(this.mappingOfRecentIdentification, identificationTime);
+    }
+
+
+    /**
+     * Remove the given listener as a listener for visualization property changes.
+     * @param listener The listener to remove.
+     */
+    public void removeListener(OnVisualizationPropertiesChangeListener listener) {
+        this.listeners.remove(listener);
+    }
+
+    /**
+     * Listener for some changes on the manager itself.
+     */
+    public interface OnVisualizationPropertiesChangeListener {
+        void onAvailableLightsChange();
+
+        void onAvailableVisualizationsChange();
+
+        void onIdentificationStarted(Map<String, Integer> lightsToColors, long endTime);
+    }
+
+    /**
+     * Request that the lights are identifiable for the given duration
+     * @param duration The duration in milliseconds for which the lights should be identifiable.
+     */
+    public void requestIdentification(final long duration) {
+        Server.POST("lamps/identify/"+duration, new Callback() {
+            @Override
+            public void onSuccess(String data) {
+
+                try {
+                    HashMap<String, Integer> mapping = new HashMap<>();
+
+                    JSONObject jsonObject = new JSONObject(data);
+                    Iterator<String> keys = jsonObject.keys();
+                    while(keys.hasNext()){
+                        String light = keys.next();
+                        int color = 0xFF000000 + Integer.parseInt(jsonObject.getString(light).substring(1, 7), 16);
+                        mapping.put(light, color);
+                    }
+
+                    startIdentification(mapping, duration);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        },"");
     }
 }

@@ -93,6 +93,42 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Animation duration"/>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/animation_duration_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="ms"/>
+
+                <EditText
+                    android:id="@+id/animation_duration"
+                    android:layout_width="match_parent"
+                    android:textAlignment="textEnd"
+                    android:inputType="number"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@+id/animation_duration_unit" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
 
         <android.support.v4.widget.Space
             android:layout_width="match_parent"

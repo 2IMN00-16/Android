@@ -1,9 +1,9 @@
 package nl.tue.san.visualization;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -19,13 +19,14 @@ public class VisualizationIO {
         // Extract simple properties
         visualization.setTimeScale(jsonObject.getLong(TIME_SCALE));
         visualization.setCycleRate(jsonObject.getLong(CYCLE_RATE));
+        visualization.setScheduler(jsonObject.getString(SCHEDULER));
+        visualization.setAnimationDuration(jsonObject.getLong(ANIMATION_DURATION));
 
         // Extract lights
-        JSONObject lights = jsonObject.getJSONObject(LIGHTS);
-        Iterator<String> lightsIter = lights.keys();
-        while(lightsIter.hasNext()) {
-            String light = lightsIter.next();
-            visualization.set(light, lights.getString(light));
+        JSONArray lights = jsonObject.getJSONArray(LIGHTS);
+
+        for(int i = 0 ; i < lights.length(); ++i) {
+            visualization.set(lights.getJSONObject(i).getString(NAME), lights.getJSONObject(i).getString(VALUE));
         }
 
         //Done
@@ -39,12 +40,13 @@ public class VisualizationIO {
         // Insert simple properties
         object.put(CYCLE_RATE, visualization.getCycleRate());
         object.put(TIME_SCALE, visualization.getTimeScale());
+        object.put(SCHEDULER, visualization.getScheduler());
+        object.put(ANIMATION_DURATION, visualization.getAnimationDuration());
 
         // Insert lights
-        JSONObject lights = new JSONObject();
+        JSONArray lights = new JSONArray();
         for(Map.Entry<String, String> entry : visualization.getMapping().entrySet())
-            if(entry.getValue() != null)
-                lights.put(entry.getKey(), entry.getValue());
+            lights.put(new JSONObject().put(NAME, entry.getValue()).put(VALUE, entry.getValue()));
         object.put(LIGHTS, lights);
 
         // Done
@@ -52,7 +54,11 @@ public class VisualizationIO {
     }
 
 
-    private static final String TASK_SET = "TaskSet";
+    private static final String VALUE = "Value";
+    private static final String NAME = "Name";
+    private static final String ANIMATION_DURATION = "Duration";
+
+    private static final String SCHEDULER = "Scheduler";
     private static final String LIGHTS = "Lights";
     private static final String CYCLE_RATE = "CycleRate";
     private static final String TIME_SCALE = "TimeScale";

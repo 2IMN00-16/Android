@@ -1,9 +1,10 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="nl.tue.san.ui.HomeFragment">
+    tools:context="nl.tue.san.ui.HomeFragment"
+    android:orientation="vertical">
 
 
     <ImageView
@@ -12,12 +13,19 @@
         app:srcCompat="@color/azure"
         android:id="@+id/home_header" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:id="@+id/progress"
+        android:layout_marginBottom="15dp" />
+
     <ScrollView
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/home_header"
-        >
+        android:id="@+id/scrollView2">
 
         <LinearLayout
             android:orientation="vertical"
@@ -72,4 +80,6 @@
     </ScrollView>
 
 
-</RelativeLayout>
+
+
+</LinearLayout>

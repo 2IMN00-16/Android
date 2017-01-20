@@ -26,14 +26,14 @@ import nl.tue.san.visualization.VisualizationManager;
  * Use the {@link VisualizationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class VisualizationFragment extends Fragment implements Navigatable {
+public class VisualizationFragment extends Fragment implements Navigatable, VisualizationManager.OnVisualizationPropertiesChangeListener {
 
     private VisualizationManager manager;
 
-    private EditText timeScale, cycleRate;
+    private EditText timeScale, cycleRate, animationDuration;
     private LinearLayout lightsContainer;
 
-    private List<LightVisualizationView> lightVisualizationViews;
+    private List<LightVisualizationView> lightVisualizationViews = new LinkedList<>();
 
     /**
      * Timer that will hide the identifying color on each LightVisualizationView once it's task is
@@ -62,11 +62,11 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         this.lightsContainer = (LinearLayout)inflated.findViewById(R.id.lights_container);
         this.timeScale = (EditText)inflated.findViewById(R.id.time_scale);
         this.cycleRate = (EditText)inflated.findViewById(R.id.cycle_rate);
-
-        this.lightVisualizationViews = new LinkedList<>();
-
+        this.animationDuration = (EditText)inflated.findViewById(R.id.animation_duration);
 
         display();
+
+        this.manager.addListener(this);
 
         return inflated;
     }
@@ -79,34 +79,41 @@ public class VisualizationFragment extends Fragment implements Navigatable {
         /*
          * Update the lights
          */
-        {
-            List<String> lights = new LinkedList<>(VisualizationManager.getInstance().getLights());
-            Collections.sort(lights);
+        this.lightVisualizationViews.clear();
+        this.lightsContainer.removeAllViews();
 
-            List<String> visualizationOptions = new LinkedList<>(VisualizationManager.getInstance().getVisualizations());
-            Collections.sort(visualizationOptions);
+        List<String> lights = new LinkedList<>(VisualizationManager.getInstance().getLights());
+        Collections.sort(lights);
 
+        List<String> visualizationOptions = new LinkedList<>(VisualizationManager.getInstance().getVisualizations());
+        Collections.sort(visualizationOptions);
 
-
-            for(String light : lights) {
-                LightVisualizationView view = new LightVisualizationView(this.getContext());
-                view.setName(light);
-                view.showVisualizationOptions(visualization.getMapping(light), visualizationOptions);
-                this.lightsContainer.addView(view);
-                this.lightVisualizationViews.add(view);
-            }
+        for(String light : lights) {
+            LightVisualizationView view = new LightVisualizationView(this.getContext());
+            view.setName(light);
+            view.showVisualizationOptions(visualization.getMapping(light), visualizationOptions);
+            this.lightsContainer.addView(view);
+            this.lightVisualizationViews.add(view);
         }
 
+        /*
+         * Update the cycle rate
+         */
         this.cycleRate.setText(String.format(Locale.getDefault(), "%d",visualization.getCycleRate()));
         this.cycleRate.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_CYCLE_RATE));
 
+        /*
+         * Update the time scale
+         */
         this.timeScale.setText(String.format(Locale.getDefault(), "%d",visualization.getTimeScale()));
         this.timeScale.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_TIME_SCALE));
 
-        // If we are currently in a situation in which we're identifying lights, display it.
-        long identificationEnd = this.manager.getEndOfRecentIdentification();
-        if(identificationEnd > System.currentTimeMillis())
-            this.identify(this.manager.getMappingOfRecentIdentification(), identificationEnd - System.currentTimeMillis());
+         /*
+         * Update the time scale
+         */
+        this.animationDuration.setText(String.format(Locale.getDefault(), "%d",visualization.getAnimationDuration()));
+        this.animationDuration.setHint(String.format(Locale.getDefault(), "%d",Visualization.DEFAULT_ANIMATION_DURATION));
+
     }
 
     private long getCycleRateInput(){
@@ -128,15 +135,29 @@ public class VisualizationFragment extends Fragment implements Navigatable {
             return Visualization.DEFAULT_TIME_SCALE;
     }
 
+
+    private long getAnimationDurationInput(){
+        if(animationDuration.getText().length() > 0)
+            return Long.parseLong(animationDuration.getText().toString());
+        else
+            return Visualization.DEFAULT_ANIMATION_DURATION;
+    }
+
+
     @Override
     public void onPause() {
         super.onPause();
-
         try {
            this.save();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        this.manager.removeListener(this);
     }
 
     /**
@@ -149,6 +170,7 @@ public class VisualizationFragment extends Fragment implements Navigatable {
 
         visualization.setCycleRate(getCycleRateInput());
         visualization.setTimeScale(getTimeScaleInput());
+        visualization.setAnimationDuration(getAnimationDurationInput());
 
         for(LightVisualizationView view : lightVisualizationViews)
             visualization.set(view.getLight(), view.getSelectedVisualization());
@@ -162,7 +184,7 @@ public class VisualizationFragment extends Fragment implements Navigatable {
      * Send out a request to the server to identify all lights.
      */
     private void requestIdentifyLights() {
-
+        this.manager.requestIdentification(5000);
     }
 
     /**
@@ -173,7 +195,7 @@ public class VisualizationFragment extends Fragment implements Navigatable {
      * @param time The amount of time for which to display the color on each light before hidin it
      *             again.
      */
-    protected void identify(final Map<String, Integer> lightsToColor, long time){
+    public void identify(final Map<String, Integer> lightsToColor, long time){
 
         // cancel the current "hide" timer
         synchronized (this) {
@@ -237,4 +259,18 @@ public class VisualizationFragment extends Fragment implements Navigatable {
             })
             .build();
 
+    @Override
+    public void onAvailableLightsChange() {
+        this.display();
+    }
+
+    @Override
+    public void onAvailableVisualizationsChange() {
+        this.display();
+    }
+
+    @Override
+    public void onIdentificationStarted(Map<String, Integer> lightToColors, long duration) {
+        this.identify(lightToColors, duration);
+    }
 }
