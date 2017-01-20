@@ -147,12 +147,17 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
     @Override
     public void onPause() {
         super.onPause();
-        this.manager.removeListener(this);
         try {
            this.save();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        this.manager.removeListener(this);
     }
 
     /**
