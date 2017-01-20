@@ -33,6 +33,8 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
     private EditText timeScale, cycleRate, animationDuration;
     private LinearLayout lightsContainer;
 
+    private View noLightsMessage;
+
     private List<LightVisualizationView> lightVisualizationViews = new LinkedList<>();
 
     /**
@@ -63,6 +65,7 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
         this.timeScale = (EditText)inflated.findViewById(R.id.time_scale);
         this.cycleRate = (EditText)inflated.findViewById(R.id.cycle_rate);
         this.animationDuration = (EditText)inflated.findViewById(R.id.animation_duration);
+        this.noLightsMessage = inflated.findViewById(R.id.message_no_lights);
 
         display();
 
@@ -87,6 +90,9 @@ public class VisualizationFragment extends Fragment implements Navigatable, Visu
 
         List<String> visualizationOptions = new LinkedList<>(VisualizationManager.getInstance().getVisualizations());
         Collections.sort(visualizationOptions);
+
+        this.lightsContainer.setVisibility(lights.size() == 0 ? View.GONE : View.VISIBLE);
+        this.noLightsMessage.setVisibility(lights.size() > 0 ? View.GONE : View.VISIBLE);
 
         for(String light : lights) {
             LightVisualizationView view = new LightVisualizationView(this.getContext());
