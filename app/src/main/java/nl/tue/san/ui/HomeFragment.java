@@ -32,10 +32,7 @@ import nl.tue.san.visualization.VisualizationManager;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements Navigatable {
-
-
-    private ProgressBar progressBar;
+public class HomeFragment extends ProgressableFragment implements Navigatable {
 
     private VisualizationManager manager;
     private TaskSetManager taskSetManager;
@@ -64,7 +61,7 @@ public class HomeFragment extends Fragment implements Navigatable {
         this.scheduler = (Spinner)inflated.findViewById(R.id.scheduler_spinner);
         this.taskSet = (Spinner)inflated.findViewById(R.id.task_set_spinner);
 
-        this.progressBar = (ProgressBar)inflated.findViewById(R.id.progress);
+        super.setProgressBar((ProgressBar) inflated.findViewById(R.id.progress));
 
         // Listen to changes to the selected scheduler, and report them to the visualization.
         this.scheduler.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -151,33 +148,6 @@ public class HomeFragment extends Fragment implements Navigatable {
         }
     }
 
-    /**
-     * Show the given amount of process
-     * @param step The progress
-     * @param total The maximally achievable progress.
-     */
-    private void showProgress(final int step, final int total){
-        this.progressBar.post(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(View.VISIBLE);
-                progressBar.setMax(total);
-                progressBar.setProgress(step);
-            }
-        });
-    }
-
-    /**
-     * Show that progress is complete. This hides the progressbar.
-     */
-    private void progressCompleted(){
-        this.progressBar.post(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
 
     /**
      * Call to start the visualization
