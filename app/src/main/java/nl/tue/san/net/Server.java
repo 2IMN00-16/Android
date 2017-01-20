@@ -29,20 +29,20 @@ public class Server {
         ));
     }
 
-    public static void DELETE(String uri, Callback cb, String data) {
+    public static void DELETE(String uri, Callback cb) {
         new RequestRunner().execute(nl.tue.san.net.IRequest.getInstance(
                 RequestTypes.DELETE,
                 uri,
-                data,
+                "",
                 cb
         ));
     }
 
-    public static void PATCH(String uri, Callback cb, String data) {
+    public static void PATCH(String uri, Callback cb) {
         new RequestRunner().execute(nl.tue.san.net.IRequest.getInstance(
                 RequestTypes.PATCH,
                 uri,
-                data,
+                "",
                 cb
         ));
     }
@@ -94,6 +94,10 @@ class RequestRunner extends AsyncTask<IRequest, Void, String> {
         Request.Builder request = new Request.Builder().url(url);
 
         switch (type) {
+            case PUT:
+                request = request.put(RequestBody.create(JSON, data));
+                break;
+
             case POST:
                 request = request.post(RequestBody.create(JSON, data));
                 break;
