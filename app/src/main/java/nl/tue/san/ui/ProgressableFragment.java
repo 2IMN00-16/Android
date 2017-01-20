@@ -26,9 +26,20 @@ public class ProgressableFragment extends Fragment {
         this.progressBar.post(new Runnable() {
             @Override
             public void run() {
+                progressBar.setIndeterminate(false);
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar.setMax(total);
                 progressBar.setProgress(step);
+            }
+        });
+    }
+
+    protected final void showIndeterminate(){
+        this.progressBar.post(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setIndeterminate(true);
+                progressBar.setVisibility(View.VISIBLE);
             }
         });
     }
