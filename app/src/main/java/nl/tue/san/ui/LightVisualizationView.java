@@ -74,7 +74,7 @@ public class LightVisualizationView extends LinearLayout {
      * @param color The color to display.
      */
     public void showIdentifyingColor(int color){
-        this.color.getDrawable().mutate().setColorFilter(0xFF000000 | color, PorterDuff.Mode.ADD);
+        this.color.getDrawable().mutate().setColorFilter(0x50000000 | (0x00FFFFFF & color), PorterDuff.Mode.SRC_ATOP);
         this.color.setVisibility(VISIBLE);
     }
 

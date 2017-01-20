@@ -25,7 +25,7 @@
             android:id="@+id/light_color"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/task_color"
+            android:src="@drawable/light_color"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
 
