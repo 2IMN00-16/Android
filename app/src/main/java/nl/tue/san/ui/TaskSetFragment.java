@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import nl.tue.san.sanseminar.R;
 import nl.tue.san.tasks.Task;
@@ -27,7 +28,7 @@ import nl.tue.san.tasks.TaskSetManager;
  * Use the {@link TaskSetFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TaskSetFragment extends Fragment implements Navigatable {
+public class TaskSetFragment extends ProgressableFragment implements Navigatable {
 
 
     private TaskSetManager taskSetManager = TaskSetManager.getInstance(this.getContext());
@@ -47,13 +48,17 @@ public class TaskSetFragment extends Fragment implements Navigatable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        this.viewPager = (ViewPager) inflater.inflate(R.layout.fragment_task_set, container, false);
+        View inflated = inflater.inflate(R.layout.fragment_task_set, container, false);
+
+        this.viewPager = (ViewPager) inflated.findViewById(R.id.pager);
 
         this.adapter = new TaskSetAdapter();
         this.viewPager.setAdapter(this.adapter);
         this.taskSetManager.addOnTaskSetsChangedListener(this.adapter);
 
-        return viewPager;
+        this.setProgressBar((ProgressBar) inflated.findViewById(R.id.progress));
+
+        return inflated;
     }
 
     public void onDestroyView(){
@@ -126,8 +131,9 @@ public class TaskSetFragment extends Fragment implements Navigatable {
      * Remove the current taskSet.
      */
     private void deleteCurrentTaskset(){
-
+        this.showIndeterminate();
         this.taskSetManager.remove(this.current());
+        this.progressCompleted();
     }
 
     /**
@@ -154,10 +160,16 @@ public class TaskSetFragment extends Fragment implements Navigatable {
             case R.id.menu_task_set_delete:
                 deleteCurrentTaskset(); return true;
             case R.id.menu_task_set_download:
-                this.taskSetManager.loadFromServer(); return true;
+                loadTaskFromServer(); return true;
         }
         return false;
 
+    }
+
+    private void loadTaskFromServer() {
+        this.showIndeterminate();
+        this.taskSetManager.loadFromServer();
+        this.progressCompleted();
     }
 
     /**
