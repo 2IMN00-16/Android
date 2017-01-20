@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import nl.tue.san.sanseminar.R;
 import nl.tue.san.tasks.Task;
@@ -131,9 +132,13 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
      * Remove the current taskSet.
      */
     private void deleteCurrentTaskset(){
-        this.showIndeterminate();
-        this.taskSetManager.remove(this.current());
-        this.progressCompleted();
+        if(taskSetManager.size() > 0) {
+            this.showIndeterminate();
+            this.taskSetManager.remove(this.current());
+            this.progressCompleted();
+        }
+        else
+            Toast.makeText(this.getContext(),"No TaskSet to delete", Toast.LENGTH_LONG).show();
     }
 
     /**
