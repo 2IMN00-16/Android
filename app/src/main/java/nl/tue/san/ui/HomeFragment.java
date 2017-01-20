@@ -21,8 +21,9 @@ import java.util.List;
 import nl.tue.san.net.Callback;
 import nl.tue.san.net.Server;
 import nl.tue.san.sanseminar.R;
+import nl.tue.san.tasks.TaskSetIO;
 import nl.tue.san.tasks.TaskSetManager;
-import nl.tue.san.visualization.Visualization;
+import nl.tue.san.visualization.VisualizationIO;
 import nl.tue.san.visualization.VisualizationManager;
 
 
@@ -84,8 +85,6 @@ public class HomeFragment extends Fragment implements Navigatable {
     }
 
     private void display(){
-
-        final Visualization visualization = manager.getVisualization();
 
         /*
          * Update the TaskSet spinner
@@ -185,6 +184,61 @@ public class HomeFragment extends Fragment implements Navigatable {
      */
     private void startVisualization() {
 
+        final int steps = 5;
+
+        try {
+            this.showProgress(0, steps);
+            final String taskSet = TaskSetIO.toJSON(this.taskSetManager.get((String) this.taskSet.getSelectedItem())).toString();
+            this.showProgress(1, steps);
+            final String visualization = VisualizationIO.toJSON(this.manager.getVisualization()).toString();
+            this.showProgress(2, steps);
+            // This is a nest of 3 requests. Due to the async nature of these requests, I could
+            // either try to sync them, or just only send the next of the previous reaches
+            // "onSuccess". The latter is easier, but looks uglier. Did that anyway.
+            Server.PUT("taskset", new Callback() {
+                @Override
+                public void onSuccess(String data) {
+                    showProgress(3, steps);
+                    Server.PUT("settings", new Callback() {
+                        @Override
+                        public void onSuccess(String data) {
+                            showProgress(4, steps);
+                            Server.PATCH("restart", new Callback() {
+                                @Override
+                                public void onSuccess(String data) {
+                                    showProgress(steps, steps);
+                                    progressCompleted();
+                                    Toast.makeText(getContext(), "Visualization was started", Toast.LENGTH_LONG).show();
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    progressCompleted();
+                                    Toast.makeText(getContext(), "Couldn't get server to start visualization", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            progressCompleted();
+                            Toast.makeText(getContext(), "Couldn't communicate visualization settings to server", Toast.LENGTH_LONG).show();
+                        }
+                    }, visualization);
+                }
+
+                @Override
+                public void onFailure() {
+                    progressCompleted();
+                    Toast.makeText(getContext(), "Couldn't communicate task set to server", Toast.LENGTH_LONG).show();
+                }
+            }, taskSet);
+
+        } catch (JSONException e) {
+            Toast.makeText(this.getContext(), "Couldn't translate objects", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            this.progressCompleted();
+        }
     }
 
     /**
