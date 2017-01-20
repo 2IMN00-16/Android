@@ -90,6 +90,7 @@ public class HomeFragment extends ProgressableFragment implements Navigatable {
             // First get all available tasks and sort them
             List<String> taskSets = new LinkedList<>(this.taskSetManager.stored());
             Collections.sort(taskSets);
+            this.taskSet.setEnabled(taskSets.size() > 0);
 
             // Then create basic adapter
             ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, taskSets);
