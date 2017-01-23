@@ -120,15 +120,75 @@ public class TaskIO {
      * @throws JSONException If writing to the JSONObject failed.
      */
     public static JSONObject toJSON(Task task) throws JSONException {
+        return  TaskIO.toJSON(task, true);
+    }
+
+    /**
+     * Converts a Task to a JSONObject. The returned JSONObject contains the following properties,
+     * in no particular order:
+     * <ul>
+     *      <li>
+     *          <strong>Name</strong>
+     *          <em>(String)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Priority</strong>
+     *          <em>(Integer >= 0)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Threshold</strong>
+     *          <em>(Integer >= 0, indicates the priority threshold for interruptions in case of FPTS)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Computation</strong>
+     *          <em>(Integer > 0, the computation time required for each job)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Period</strong>
+     *          <em>(Integer > 0, indicates how much time exists between two job instances of the task)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Deadline</strong>
+     *          <em>(Integer > 0, indicates how much time a job instance has to complete)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Offset</strong>
+     *          <em>(Integer >= 0, indicates the offset in the arrival of the first job of this task, opposed to the global starting time)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Color</strong>
+     *          <em>(Color (#RRGGBB), the color to use to represent this task)</em>
+     *      </li>
+     * </ul>
+     * @param task The Task to convert to JSON
+     * @param allowThresholdFlags Whether the threshold should be absolute
+     *                            ({@code false}) or whether flag values are also allowed
+     *                            ({@code true}).
+     * @return A JSONObject representing the given Task.
+     * @throws JSONException If writing to the JSONObject failed.
+     */
+    public static JSONObject toJSON(Task task, boolean allowThresholdFlags) throws JSONException {
         return new JSONObject()
                 .put(NAME, task.getName())
                 .put(PRIORITY,task.getPriority())
-                .put(THRESHOLD,task.getThreshold())
+                .put(THRESHOLD,allowThresholdFlags ? task.getThreshold() : absoluteThreshold(task))
                 .put(COMPUTATION,task.getComputation())
                 .put(PERIOD,task.getPeriod())
                 .put(DEADLINE,task.getDeadline())
                 .put(OFFSET,task.getOffset())
                 .put(COLOR,'#'+task.getHexColor());
+    }
+
+    /**
+     * Get the absolute threshold for the given task
+     * @param task The Task from which to obtain the absolute value
+     * @return The absolute threshold value.
+     */
+    private static int absoluteThreshold(Task task) {
+        if(task.getThreshold() == Task.NO_PREEMPTION_THRESHOLD)
+            return task.getPriority() + 1;
+        else
+            return task.getThreshold();
     }
 
     private static final String NAME = "Name";
