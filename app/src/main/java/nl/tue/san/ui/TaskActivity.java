@@ -290,6 +290,10 @@ public class TaskActivity extends AppCompatActivity {
         TaskSet selected = ((TaskSet)this.taskTaskSet.getSelectedItem());
         if(this.taskSet != selected && selected.get(this.taskNameEditor.getText().toString()) != null )
             throw new IllegalTaskStateException("A Task with the given name already exists in the intended Task Set. ", this.taskTaskSet, this.taskNameEditor);
+
+        for(Task task : selected.getOrderedTasks())
+            if(this.task != task && this.getTextAsInteger(this.taskPriorityEditor) == task.getPriority())
+                throw new IllegalTaskStateException("Task \""+task.getName()+"\" has the same priority. Each priority should be unique", this.taskPriorityEditor);
     }
 
     /**
