@@ -168,7 +168,7 @@ public class HomeFragment extends ProgressableFragment implements Navigatable {
 
             try {
                 this.showProgress(0, steps);
-                final String taskSet = TaskSetIO.toJSON(this.taskSetManager.get((String) this.taskSet.getSelectedItem())).toString();
+                final String taskSet = TaskSetIO.toJSON(this.taskSetManager.get((String) this.taskSet.getSelectedItem()), false).toString();
                 this.showProgress(1, steps);
                 final String visualization = VisualizationIO.toJSON(this.manager.getVisualization()).toString();
                 this.showProgress(2, steps);

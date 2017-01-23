@@ -93,10 +93,35 @@ public class TaskSetIO {
      * @throws JSONException If writing to the JSONObject failed.
      */
     public static JSONObject toJSON(TaskSet taskSet) throws JSONException {
+        return TaskSetIO.toJSON(taskSet, true);
+    }
+
+    /**
+     * Converts a TaskSet to a JSONObject. The returned JSONObject contains the following properties,
+     * in no particular order:
+     * <ul>
+     *      <li>
+     *          <strong>Name</strong>
+     *          <em>(String)</em>
+     *      </li>
+     *      <li>
+     *          <strong>Tasks</strong>
+     *          <em>(Array. The items in the array are match the requirements set by
+     *          {@link TaskIO#toJSON(Task)} )</em>
+     *      </li>
+     * </ul>
+     * @param taskSet The TaskSet to convert to JSON
+     * @param allowThresholdFlags Whether the threshold should be absolute
+     *                            ({@code false}) or whether flag values are also allowed
+     *                            ({@code true}).
+     * @return A JSONObject representing the given TaskSet.
+     * @throws JSONException If writing to the JSONObject failed.
+     */
+    public static JSONObject toJSON(TaskSet taskSet, boolean allowThresholdFlags) throws JSONException {
 
         JSONArray tasks = new JSONArray();
         for(Task task : taskSet.getOrderedTasks())
-            tasks.put(TaskIO.toJSON(task));
+            tasks.put(TaskIO.toJSON(task, allowThresholdFlags));
 
         return new JSONObject()
                 .put(TASKS,tasks)
@@ -104,6 +129,5 @@ public class TaskSetIO {
                 ;
 
     }
-
 
 }
