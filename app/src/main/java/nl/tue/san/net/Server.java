@@ -101,9 +101,12 @@ class RequestRunner extends AsyncTask<IRequest, Void, String> {
             case POST:
                 request = request.post(RequestBody.create(JSON, data));
                 break;
+            case PATCH:
+                request = request.patch(RequestBody.create(JSON, data));
+                break;
             case GET:
             case DELETE:
-            case PATCH:
+
             default:
                 // Do nothing
                 break;
