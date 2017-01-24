@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -143,7 +142,7 @@ public class HomeFragment extends ProgressableFragment implements Navigatable {
                 public void onFailure() {
                     schedulers.clear();
                     scheduler.setEnabled(false);
-                    Toast.makeText(getContext(), "Failed to load schedulers from server", Toast.LENGTH_LONG).show();
+                    HomeFragment.super.showMessage("Failed to load schedulers from server");
                 }
             });
         }
@@ -158,11 +157,11 @@ public class HomeFragment extends ProgressableFragment implements Navigatable {
         final int steps = 5;
 
         if(this.taskSet.getSelectedItem() == null) {
-            Toast.makeText(getContext(),"No task set selected", Toast.LENGTH_LONG).show();
+            super.showMessage("No task set selected");
         } else if(this.taskSetManager.get((String) this.taskSet.getSelectedItem()) == null) {
-            Toast.makeText(getContext(),"Selected task set no longer exists", Toast.LENGTH_LONG).show();
+            super.showMessage("Selected task set no longer exists");
         } else if (this.scheduler.getSelectedItem() == null) {
-            Toast.makeText(getContext(),"No scheduler selected", Toast.LENGTH_LONG).show();
+            super.showMessage("No scheduler selected");
 
         } else {
 
@@ -188,13 +187,13 @@ public class HomeFragment extends ProgressableFragment implements Navigatable {
                                     public void onSuccess(String data) {
                                         showProgress(steps, steps);
                                         progressCompleted();
-                                        Toast.makeText(getContext(), "Visualization was started", Toast.LENGTH_LONG).show();
+                                        HomeFragment.super.showMessage("Visualization was started");
                                     }
 
                                     @Override
                                     public void onFailure() {
                                         progressCompleted();
-                                        Toast.makeText(getContext(), "Couldn't get server to start visualization", Toast.LENGTH_LONG).show();
+                                        HomeFragment.super.showMessage("Couldn't get server to start visualization");
                                     }
                                 });
                             }
@@ -202,7 +201,7 @@ public class HomeFragment extends ProgressableFragment implements Navigatable {
                             @Override
                             public void onFailure() {
                                 progressCompleted();
-                                Toast.makeText(getContext(), "Couldn't communicate visualization settings to server", Toast.LENGTH_LONG).show();
+                                HomeFragment.super.showMessage("Couldn't communicate visualization settings to server");
                             }
                         }, visualization);
                     }
@@ -210,12 +209,12 @@ public class HomeFragment extends ProgressableFragment implements Navigatable {
                     @Override
                     public void onFailure() {
                         progressCompleted();
-                        Toast.makeText(getContext(), "Couldn't communicate task set to server", Toast.LENGTH_LONG).show();
+                        HomeFragment.super.showMessage("Couldn't communicate task set to server");
                     }
                 }, taskSet);
 
             } catch (JSONException e) {
-                Toast.makeText(this.getContext(), "Couldn't translate objects", Toast.LENGTH_LONG).show();
+                HomeFragment.super.showMessage("Couldn't translate objects");
                 e.printStackTrace();
                 this.progressCompleted();
             }
