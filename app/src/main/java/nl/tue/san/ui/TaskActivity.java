@@ -111,7 +111,7 @@ public class TaskActivity extends AppCompatActivity {
         // EditTexts / editors
         this.taskColorEditor = ((ColorPickerView)this.findViewById(R.id.task_color));
         this.taskColorEditor.provideFragmentManager(this.getFragmentManager());
-        this.taskColorEditor.setColorOptions(getResources().getIntArray(R.array.default_rainbow));
+        this.taskColorEditor.setColorOptions(getResources().getIntArray(R.array.rainbow));
 
         this.taskPriorityEditor = ((EditText)this.findViewById(R.id.task_priority));
         this.taskPeriodEditor = ((EditText)this.findViewById(R.id.task_period));
