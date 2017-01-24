@@ -46,7 +46,7 @@ public class VisualizationIO {
         // Insert lights
         JSONArray lights = new JSONArray();
         for(Map.Entry<String, String> entry : visualization.getMapping().entrySet())
-            lights.put(new JSONObject().put(NAME, entry.getValue()).put(VALUE, entry.getValue()));
+            lights.put(new JSONObject().put(NAME, entry.getKey()).put(VALUE, entry.getValue()));
         object.put(LIGHTS, lights);
 
         // Done
