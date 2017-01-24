@@ -134,7 +134,7 @@ public class TaskActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     taskPriorityThresholdContainer.setVisibility(isChecked ? VISIBLE : GONE);
                 if(getTextAsInteger(taskPriorityThresholdEditor) < 0)
-                    setIntegerAsText(taskPriorityThresholdEditor, Math.max(getTextAsInteger(taskPriorityEditor) + 1, 0));
+                    setIntegerAsText(taskPriorityThresholdEditor, Math.max(getTextAsInteger(taskPriorityEditor), 0));
             }
         });
     }
@@ -284,8 +284,8 @@ public class TaskActivity extends AppCompatActivity {
         if(this.task == null && this.manager.get(this.taskNameEditor.getText().toString()) != null)
             throw new IllegalTaskStateException("A task with this name already exists in this task set", this.taskNameEditor);
 
-        if(this.defineThresholdCheckBox.isChecked() && this.getTextAsInteger(taskPriorityThresholdEditor) <= this.getTextAsInteger(taskPriorityEditor)){
-            throw new IllegalTaskStateException("Priority Threshold must be strictly larger than the priority", this.taskPriorityEditor, this.taskPriorityThresholdEditor);
+        if(this.defineThresholdCheckBox.isChecked() && this.getTextAsInteger(taskPriorityThresholdEditor) < this.getTextAsInteger(taskPriorityEditor)){
+            throw new IllegalTaskStateException("Priority Threshold must be equal to, or be larger than the priority", this.taskPriorityEditor, this.taskPriorityThresholdEditor);
         }
         TaskSet selected = ((TaskSet)this.taskTaskSet.getSelectedItem());
         if(this.taskSet != selected && selected.get(this.taskNameEditor.getText().toString()) != null )
