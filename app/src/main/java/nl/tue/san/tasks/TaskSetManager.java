@@ -182,7 +182,12 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
 
     @Override
     protected LinkedHashMap<String, TaskSet> initialObject() {
-        return new LinkedHashMap<>();
+
+
+        LinkedHashMap<String, TaskSet> initial = new LinkedHashMap<>();
+        TaskSet defaultTaskSet = defaultTaskSet();
+        initial.put(defaultTaskSet.getName(), defaultTaskSet);
+        return initial;
     }
 
     /**
@@ -296,5 +301,48 @@ public class TaskSetManager extends Manager<LinkedHashMap<String, TaskSet>> {
         void onTaskSetAdded(TaskSet taskSet);
 
         void onTaskSetRemoved(TaskSet taskSet);
+    }
+
+    /**
+     * Create a new default task set. 
+     * @return
+     */
+    private static TaskSet defaultTaskSet() {
+        try {
+            return TaskSetIO.fromJSON(new JSONObject("{\n" +
+                    "\t\"Tasks\": [\n" +
+                    "\t\t{\n" +
+                    "\t\t\t\"Name\": \"T1\",\n" +
+                    "\t\t\t\"Priority\": 1,\n" +
+                    "\t\t\t\"Computation\": 20,\n" +
+                    "\t\t\t\"Period\": 70,\n" +
+                    "\t\t\t\"Deadline\": 50,\n" +
+                    "\t\t\t\"Threshold\": 3,\n" +
+                    "\t\t\t\"Color\": \"#0000ff\"\n" +
+                    "\t\t},\n" +
+                    "\t\t{\n" +
+                    "\t\t\t\"Name\": \"T2\",\n" +
+                    "\t\t\t\"Priority\": 2,\n" +
+                    "\t\t\t\"Computation\": 20,\n" +
+                    "\t\t\t\"Period\": 80,\n" +
+                    "\t\t\t\"Deadline\": 80,\n" +
+                    "\t\t\t\"Threshold\": 3,\n" +
+                    "\t\t\t\"Color\": \"#ff0000\"\n" +
+                    "\t\t},\n" +
+                    "\t\t{\n" +
+                    "\t\t\t\"Name\": \"T3\",\n" +
+                    "\t\t\t\"Priority\": 3,\n" +
+                    "\t\t\t\"Computation\": 35,\n" +
+                    "\t\t\t\"Period\": 200,\n" +
+                    "\t\t\t\"Deadline\": 100,\n" +
+                    "\t\t\t\"Threshold\": 2,\n" +
+                    "\t\t\t\"Color\": \"#00ff00\"\n" +
+                    "\t\t}\n" +
+                    "\t],\n" +
+                    "\t\"Name\": \"Default\"\n" +
+                    "}"));
+        } catch (JSONException e) {
+            return new TaskSet("Default");
+        }
     }
 }
