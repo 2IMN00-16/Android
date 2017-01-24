@@ -61,7 +61,7 @@ public class VisualizationIO {
     private static final String SCHEDULER = "Scheduler";
     private static final String LIGHTS = "Lights";
     private static final String CYCLE_RATE = "CycleRate";
-    private static final String TIME_SCALE = "TimeScale";
+    private static final String TIME_SCALE = "TimeFactor";
 
 
 
