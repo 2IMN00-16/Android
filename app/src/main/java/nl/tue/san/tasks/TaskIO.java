@@ -186,7 +186,7 @@ public class TaskIO {
      */
     private static int absoluteThreshold(Task task) {
         if(task.getThreshold() == Task.NO_PREEMPTION_THRESHOLD)
-            return task.getPriority() + 1;
+            return task.getPriority();
         else
             return task.getThreshold();
     }
