@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import nl.tue.san.sanseminar.R;
 import nl.tue.san.tasks.Task;
@@ -147,7 +146,7 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
             this.progressCompleted();
         }
         else
-            Toast.makeText(this.getContext(),"No TaskSet to delete", Toast.LENGTH_LONG).show();
+            super.showMessage("No TaskSet to delete");
     }
 
     /**
@@ -158,7 +157,7 @@ public class TaskSetFragment extends ProgressableFragment implements Navigatable
             this.createOrModify(current(), null);
         }
         else
-            Toast.makeText(this.getContext(),"No TaskSet to create a task for", Toast.LENGTH_LONG).show();
+            super.showMessage("No TaskSet to create a task for");
 
     }
 

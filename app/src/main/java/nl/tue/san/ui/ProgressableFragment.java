@@ -1,6 +1,5 @@
 package nl.tue.san.ui;
 
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -8,7 +7,7 @@ import android.widget.ProgressBar;
  * Created by Maurice on 20-1-2017.
  */
 
-public class ProgressableFragment extends Fragment {
+public class ProgressableFragment extends ToastFragment {
 
 
     private ProgressBar progressBar;
